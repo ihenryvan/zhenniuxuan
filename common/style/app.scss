@@ -1,0 +1,126 @@
+/* 全局公共样式 */
+
+.app-w100 {
+	width: 100%;
+}
+.app-round {
+	border-radius: 50%;
+}
+
+
+.app-tc {
+	text-align: center;
+}
+.app-tr {
+	text-align: right;
+}
+.app-ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	max-width: 100%;
+}
+.app-ellipsis2 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	text-align: center;
+	}
+
+
+.app-flex {
+	display: flex;
+    flex-wrap: wrap;
+	&.row-reverse {
+		flex-direction: row-reverse;
+	}
+	&.space-between {
+		justify-content: space-between;
+		align-items: center;
+	}
+	&.space-around {
+		justify-content: space-around;
+		align-items: center;
+	}
+	&.align-center {
+		align-items: center;
+	}
+}
+.app-column {
+	flex-direction: column;
+}
+.app-flex-item {
+	flex: 1;
+}
+.app-flex-center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+
+.app-fixed-bottom {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.app-add-btn {
+	position: fixed;
+	right: 30rpx;
+	bottom: 200rpx;
+	text {
+		position: absolute;
+		width: 100%;
+		color: #fff;
+		text-align: center;
+		font-size: 24rpx;
+		bottom: 24rpx;
+		scale: 0.9;
+	}
+}
+
+.app-tabs-panel {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 99;
+    padding-top: calc(var(--status-bar-height) + 44px);
+    background: #FFFFFF;
+    &.near-top {
+        padding-top: var(--status-bar-height);
+    }
+    
+    .u-tabs__wrapper__nav__line {
+    	bottom: 10rpx !important;
+        border-radius: 10rpx;
+    }
+    .u-tabs__wrapper__nav__item__text {
+    	font-size: 32rpx;
+    	font-weight: 400;
+        color: #30393E;
+    }
+}
+.app-gap-tow-bar {
+    padding-top: 88px;
+}
+
+.app-indicator {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    bottom: 26rpx;
+    .item {
+        width: 12rpx;
+        height: 12rpx;
+        margin: 0 8rpx;
+        background: #D8D8D8;
+        border-radius: 8rpx;
+        &.selected {
+            background: #1A1A1A;
+        }
+    }
+}

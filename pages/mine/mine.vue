@@ -1,48 +1,72 @@
 <template>
     <view class="page-wrap">
-        <app-img src="/static/mine/top-bg.png" w="750" h="678"></app-img>
+        <app-img src="/static/mine/top-bg.png" w="750" h="322"></app-img>
         
-        <view class="page-cont">
-            <view class="info">
-                <view class="left" @click="onAuth">
-                    <app-img src="/static/mine/avatar-bg.png" w="164" h="164"></app-img>
-                    <app-img v-if="appStore.hasLogin" :src="appStore.userInfo.avatar" type="avatar" w="108" h="108" class="avatar"></app-img>
-                    <app-img v-else src="/static/mine/avatar.png" w="108" h="108" class="avatar"></app-img>
-                </view>
-                <view class="right">
-                    <view class="name">
-                        <text @click="onAuth">{{appStore.hasLogin ? appStore.userInfo.nickname : '点击登录'}}</text>
-                    </view>
-                    <view class="phone" v-if="appStore.hasLogin">{{appStore.userInfo.mobileNo}}</view>
-                </view>
+        <!-- <view class="info">
+            <view class="left" @click="onAuth">
+                <app-img src="/static/mine/avatar-bg.png" w="164" h="164"></app-img>
+                <app-img v-if="appStore.hasLogin" :src="appStore.userInfo.avatar" type="avatar" w="108" h="108" class="avatar"></app-img>
+                <app-img v-else src="/static/mine/avatar.png" w="108" h="108" class="avatar"></app-img>
             </view>
-            
-            <view class="list">
-                <view class="item" @click="onPreview">
-                    <view class="left">
-                        <app-img src="/static/mine/model.png" w="152" h="152"></app-img>
-                    </view>
-                    <view class="center">
-                        <view class="title">我的3D模型</view>
-                        <view class="sub-title">查看您的专属3D模型</view>
-                    </view>
-                    <view class="right">
-                        <app-img src="/static/mine/icon-arrow.png" w="48" h="48"></app-img>
-                    </view>
+            <view class="right">
+                <view class="name">
+                    <text @click="onAuth">{{appStore.hasLogin ? appStore.userInfo.nickname : '点击登录'}}</text>
                 </view>
-                
-                <view class="item" @click="goAbout">
-                    <view class="left">
-                        <app-img src="/static/mine/about.png" w="152" h="152"></app-img>
-                    </view>
-                    <view class="center">
-                        <view class="title">关于我们</view>
-                        <view class="sub-title">Xmate Live</view>
-                    </view>
-                    <view class="right">
-                        <app-img src="/static/mine/icon-arrow.png" w="48" h="48"></app-img>
-                    </view>
-                </view>
+                <view class="phone" v-if="appStore.hasLogin">{{appStore.userInfo.mobileNo}}</view>
+            </view>
+        </view> -->
+        
+        <view class="avatar app-flex-center">
+            <app-img src="/static/mine/avatar.png" w="144" h="144"></app-img>
+        </view>
+        <view class="nickname app-flex-center">
+            <text>达到爱</text>
+        </view>
+        
+        
+        <view class="amount-wrap app-flex">
+            <view class="item">
+                <view class="label">优惠券</view>
+                <view class="value">0</view>
+            </view>
+            <view class="item">
+                <view class="label">余额</view>
+                <view class="value">0</view>
+            </view>
+            <view class="item">
+                <view class="label">消息</view>
+                <view class="value">0</view>
+            </view>
+        </view>
+        
+        <view class="member-wrap">
+            <app-img src="/static/mine/11.png" w="742" h="562"></app-img>
+        </view>
+        
+        <view class="opt-list">
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">我的客服</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
+            </view>
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">我的订单</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
+            </view>
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">我的会员</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
+            </view>
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">地址管理</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
+            </view>
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">设置</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
+            </view>
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+                <view class="label app-flex-item">我的发票</view>
+                <u-icon name="arrow-right" size="16" color="#333" />
             </view>
         </view>
     </view>
@@ -84,14 +108,11 @@
 
 <style lang="scss">
     page {
-        background: #f7f8fa;
+        // background: #f7f8fa;
     }
 </style>
 <style scoped lang="scss">
-    .page-cont {
-        position: relative;
-        padding: 0 32rpx;
-        margin-top: -476rpx;
+    .page-wrap {
         .info {
             display: flex;
             align-items: center;
@@ -125,32 +146,38 @@
             }
         }
         
-        .list {
+        .avatar {
+            margin-top: -72rpx;
+        }
+        .amount-wrap {
+            padding-top: 56rpx;
             .item {
-                display: flex;
-                align-items: center;
-                border: solid 2rpx #fff;
-                background: linear-gradient( 180deg, #3A8F96 0%, #E4FDFF 0%, #E7FDFF 65%, #E7FDFF 100%);
-                overflow: hidden;
-                border-radius: 12rpx;
-                padding: 26rpx 34rpx;
-                margin: 34rpx 0;
-                .left {}
-                .center {
-                    flex: 1;
-                    padding-left: 30rpx;
-                    .title {
-                        color: #06285C;
-                        font-size: 36rpx;
-                    }
-                    .sub-title {
-                        color: #939393;
-                        font-size: 26rpx;
-                        padding-top: 20rpx;
-                    }
+                width: 33.33%;
+                text-align: center;
+                .label {
+                    color: #939393;
+                    font-size: 26rpx;
                 }
-                .right {}
+                .value {
+                    font-size: 36rpx;
+                    padding-top: 16rpx;
+                }
             }
+        }
+        .member-wrap {
+            padding-top: 40rpx;
+        }
+        .opt-list {
+            padding: 0 24rpx;
+        	.opt-item {
+                height: 100rpx;
+                &:not(:last-child) {
+                    border-bottom: solid 1px #F7F8FA;
+                }
+        		.label {
+        			font-size: 28rpx;
+        		}
+        	}
         }
     }
 </style>

@@ -1,5 +1,5 @@
 {
-    "name" : "Xmate",
+    "name" : "臻牛宣",
     "appid" : "__UNI__634C01A",
     "description" : "",
     "versionName" : "1.0.0",
@@ -50,7 +50,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "wx1c2003c37b73f953",
+        "appid" : "wxc4cbe6a5c772f279",
         "setting" : {
             "urlCheck" : false
         },
@@ -60,7 +60,8 @@
                 "desc" : "为用户推荐更近的充电服务点"
             }
         },
-        "requiredPrivateInfos" : [ "getLocation" ]
+        "requiredPrivateInfos" : [ "getLocation" ],
+        "libVersion": "latest"
     },
     "mp-alipay" : {
         "usingComponents" : true

@@ -4,7 +4,7 @@
     
     export default {
         onLaunch: function() {
-            reStoreInfo()
+            // reStoreInfo()
         },
         onShow: function() {
         },
