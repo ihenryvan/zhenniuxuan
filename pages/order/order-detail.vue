@@ -1,18 +1,30 @@
 <template>
+    <u-navbar bgColor="#fff" title="已完成" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
-        <u-sticky>
-            <u-navbar bgColor="#fff" title="订单" leftIcon="" :placeholder="true" />
-            <view style="background: #fff;">
-                <u-tabs :list="tabList" :scrollable="false" lineColor="#E6212B" :activeStyle="{ color: '#E6212B' }"></u-tabs>
+        <view class="info-wrap">
+            <view class="status-info">
+                <view class="app-flex-center">
+                    <app-img src="/static/order/icon-status.png" w="258" h="258"></app-img>
+                </view>
+                <view class="status-txt">感谢您的光临</view>
             </view>
-        </u-sticky>
+            <view class="shop-info app-flex align-center">
+                <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
+                <view class="name">牛气无语（龙华清湖店）</view>
+                <!-- <u-icon class="icon" name="arrow-right" size="16" color="#333" /> -->
+            </view>
+            <view class="doc-info app-flex align-center">
+                <u-icon name="map" size="18" color="#666" />
+                <text>距离您14.10km</text>
+            </view>
+        </view>
         
         <view class="order-list">
-            <view class="item" v-for="item in 5" @click="onPreview(item.videoNo)">
+            <view class="item">
                 <view class="top app-flex-center">
                     <view class="app-flex-item app-flex align-center">
-                        <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img>
-                        <view class="name">牛气无语（龙华清湖店）</view>
+                        <!-- <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img> -->
+                        <view class="name">订单编号：9977712562123</view>
                     </view>
                     <view class="status">待提货</view>
                 </view>
@@ -47,14 +59,8 @@
                 </view>
             </view>
         </view>
-        
     </view>
     
-    <u-popup :show="popup.show" mode="center">
-        <view>
-            <text>出</text>
-        </view>
-    </u-popup>
 </template>
 
 <script setup>
@@ -66,10 +72,9 @@ let popup = reactive({
 })
 
 let list = ref([])
-let tabList = ref([
-    {name: '全部'},
-    {name: '门店订单'},
-    {name: '售后'},
+let goodsList = ref([
+    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
+    { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
 ])
 
 // getVideo().then(data => {
@@ -78,10 +83,18 @@ let tabList = ref([
 //     }
 // })
 
+
+function updateCarNum(e) {
+    let indexArr = e.name.split('-')
+    let val = e.value
+    
+    // goodsList.value[indexArr[0]].list[indexArr[1]].num = val
+}
+
 function onPreview(no) {
     // popup.show = true
     uni.navigateTo({
-        url: `/pages/order/order-detail?no=${no}`
+        url: `/pages/photo/detail?no=${no}`
     })
 }
 </script>
@@ -93,11 +106,49 @@ function onPreview(no) {
 </style>
 <style scoped lang="scss">
     .page-wrap {
+        padding: 24rpx;
+        .info-wrap {
+            background: #fff;
+            padding: 28rpx 24rpx;
+            border-radius: 16rpx;
+            .status-info {
+                padding: 10rpx 0 44rpx;
+                .status-txt {
+                    font-size: 32rpx;
+                    text-align: center;
+                }
+            }
+            .shop-info {
+                border-top: solid 1px #F7F8FA;
+                padding-top: 30rpx;
+                .name {
+                    font-size: 30rpx;
+                    padding-left: 16rpx;
+                }
+                .icon {
+                    position: relative;
+                    top: 4rpx;
+                }
+            }
+            .doc-info {
+                padding-top: 16rpx;
+                padding-left: 2rpx;
+                text {
+                    color: #939393;
+                    font-size: 28rpx;
+                    margin-left: 14rpx;
+                }
+            }
+        }
+        
+        
         .order-list {
+            padding-top: 30rpx;
             .item {
                 background: #fff;
                 margin-bottom: 30rpx;
                 padding: 0 24rpx;
+                border-radius: 16rpx;
                 .top {
                     min-height: 88rpx;
                     .name {
@@ -147,15 +198,17 @@ function onPreview(no) {
                 }
             }
         }
-    }
-    
-    .price {
-        align-items: baseline;
-        text {
-            font-size: 24rpx;
-        }
-        .val {
-            font-size: 32rpx;
+        
+        
+        .price {
+            display: flex;
+            align-items: baseline;
+            text {
+                font-size: 24rpx;
+            }
+            .val {
+                font-size: 34rpx;
+            }
         }
     }
 </style>

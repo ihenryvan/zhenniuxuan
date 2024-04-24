@@ -61,7 +61,7 @@
             }
         },
         "requiredPrivateInfos" : [ "getLocation" ],
-        "libVersion": "latest"
+        "libVersion" : "latest"
     },
     "mp-alipay" : {
         "usingComponents" : true

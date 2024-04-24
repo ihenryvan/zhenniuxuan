@@ -15,6 +15,13 @@
         	}
         },
         {
+        	"path": "pages/booking/pay",
+        	"style": {
+        		"navigationBarTitleText": "下单",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
         	"path": "pages/order/order",
         	"style": {
         		"navigationBarTitleText": "订单",
@@ -22,9 +29,51 @@
         	}
         },
         {
+        	"path": "pages/order/order-detail",
+        	"style": {
+        		"navigationBarTitleText": "订单详情",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
         	"path": "pages/mine/mine",
         	"style": {
         		"navigationBarTitleText": "我的",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
+        	"path": "pages/mine/member",
+        	"style": {
+        		"navigationBarTitleText": "会员",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
+        	"path": "pages/mine/address",
+        	"style": {
+        		"navigationBarTitleText": "地址",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
+        	"path": "pages/mine/servicer",
+        	"style": {
+        		"navigationBarTitleText": "客服",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
+        	"path": "pages/mine/invoice",
+        	"style": {
+        		"navigationBarTitleText": "客服",
+        		"navigationStyle": "custom"
+        	}
+        },
+        {
+        	"path": "pages/mine/setup",
+        	"style": {
+        		"navigationBarTitleText": "设置",
         		"navigationStyle": "custom"
         	}
         }

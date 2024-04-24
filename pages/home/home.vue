@@ -1,12 +1,9 @@
 <template>
     <view class="page-wrap">
         <u-navbar
-            leftText="返回"
-            bgColor="transparent"
             title="首页"
+            bgColor="transparent"
             :safeAreaInsetTop="true"
-            :autoBack="false"
-            :placeholder="true"
             @leftClick="onLeftClick"
             titleStyle="color: #fff"
         >
@@ -20,12 +17,11 @@
             </template>
         </u-navbar>
         
-        
         <app-img src="/static/home/top-bg.png" w="750" h="678"></app-img>
         <view class="page-cont">
             <view class="grid-list">
-                <u-grid :border="false" @click="click">
-                    <u-grid-item v-for="(item, index) in gridList" :key="index" style="margin: 14rpx 0;">
+                <u-grid :border="false">
+                    <u-grid-item v-for="(item, index) in gridList" :key="index" style="margin: 14rpx 0;" @click="goMeat">
                         <!-- <view> -->
                             <app-img :src="`/static/home/grid-icon${index}.png`" w="80" h="80"></app-img>
                             <text class="grid-text">{{item}}</text>
@@ -52,6 +48,19 @@
                     <view class="sub">即送100元立减券+全年9.5折+每月66元券包</view>
                 </view>
             </view>
+            
+            
+            <view class="activity-wrap">
+                <view class="title">
+                    <app-img src="/static/home/activity-title.png" w="258" h="44"></app-img>
+                </view>
+                <u-scroll-list :indicator="false">
+                    <view class="item" v-for="(item, index) in 3" :key="index">
+                        <app-img src="/static/home/activity.png" w="532" h="236"></app-img>
+                        <view class="label">【臻牛宣】99元里脊牛排特价预售</view>
+                    </view>
+                </u-scroll-list>
+            </view>
         </view>
     </view>
 </template>
@@ -71,7 +80,11 @@ let gridList = ref(['吊龙', '肋条', '牛腱子', '牛腩', '牛肉', '雪花
 //         list.value = data
 //     }
 // })
-
+function goMeat() {
+    uni.switchTab({
+        url: '/pages/booking/booking'
+    })
+}
 function onPreview(data) {
     // popup.show = true
     uni.navigateTo({
@@ -140,6 +153,26 @@ function onLeftClick() {}
                     color: #fff;
                     font-size: 24rpx;
                     margin-top: 6rpx;
+                }
+            }
+        }
+        
+        .activity-wrap {
+            .title {
+                padding-top: 50rpx;
+                padding-bottom: 30rpx;
+            }
+            .item {
+                min-width: 532rpx;
+                overflow: hidden;
+                border-radius: 16rpx;
+                &:not(:last-child) {
+                    margin-right: 24rpx;
+                }
+                .label {
+                    background: #fff;
+                    padding: 24rpx;
+                    font-size: 28rpx;
                 }
             }
         }

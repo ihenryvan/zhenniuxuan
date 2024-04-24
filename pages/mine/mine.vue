@@ -44,27 +44,27 @@
         </view>
         
         <view class="opt-list">
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/servicer?type=about')">
                 <view class="label app-flex-item">我的客服</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <!-- <view class="opt-item app-flex-center" @click="goOrder">
                 <view class="label app-flex-item">我的订单</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
-            </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            </view> -->
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/member?type=about')">
                 <view class="label app-flex-item">我的会员</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/address?type=about')">
                 <view class="label app-flex-item">地址管理</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/setup?type=about')">
                 <view class="label app-flex-item">设置</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/invoice')">
                 <view class="label app-flex-item">我的发票</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
@@ -101,6 +101,18 @@
     function goAbout() {
         uni.navigateTo({
             url: '/pages/mine/about'
+        })
+    }
+    
+    function $navTo(path) {
+        uni.navigateTo({
+            url: path,
+        })
+    }
+    
+    function goOrder() {
+        uni.switchTab({
+            url: '/pages/order/order'
         })
     }
     
