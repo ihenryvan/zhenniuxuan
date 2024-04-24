@@ -4,7 +4,7 @@
     
     export default {
         onLaunch: function() {
-            // reStoreInfo()
+            reStoreInfo()
         },
         onShow: function() {
         },
@@ -21,9 +21,9 @@
                     return
                 }
                 getSession({ code: res.code }).then(data => {
-                    if (data && data.token) {
+                    if (data && data.user && data.user.token) {
                         data.openId = data.openid
-                        appStore.storeUserInfo(data)
+                        appStore.storeUserInfo(data.user)
                     }
                 })
             }

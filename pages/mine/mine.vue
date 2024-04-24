@@ -2,25 +2,19 @@
     <view class="page-wrap">
         <app-img src="/static/mine/top-bg.png" w="750" h="322"></app-img>
         
-        <!-- <view class="info">
-            <view class="left" @click="onAuth">
-                <app-img src="/static/mine/avatar-bg.png" w="164" h="164"></app-img>
-                <app-img v-if="appStore.hasLogin" :src="appStore.userInfo.avatar" type="avatar" w="108" h="108" class="avatar"></app-img>
-                <app-img v-else src="/static/mine/avatar.png" w="108" h="108" class="avatar"></app-img>
-            </view>
-            <view class="right">
-                <view class="name">
-                    <text @click="onAuth">{{appStore.hasLogin ? appStore.userInfo.nickname : '点击登录'}}</text>
+        <view class="avatar-wrap app-flex-center">
+            <view style="padding: 0 40rpx;" @click="onAuth">
+                <view class="avatar">
+                    <app-img v-if="appStore.hasLogin" type="avatar" :src="appStore.userInfo.avatar" w="144" h="144"></app-img>
+                    <app-img v-else src="/static/mine/avatar.png" w="144" h="144"></app-img>
                 </view>
-                <view class="phone" v-if="appStore.hasLogin">{{appStore.userInfo.mobileNo}}</view>
+                <view class="nickname app-flex-center" v-if="!appStore.hasLogin">点击登录</view>
             </view>
-        </view> -->
-        
-        <view class="avatar app-flex-center">
-            <app-img src="/static/mine/avatar.png" w="144" h="144"></app-img>
         </view>
-        <view class="nickname app-flex-center">
-            <text>达到爱</text>
+        
+        <view class="nickname app-flex-center" v-if="appStore.hasLogin" style="padding-top: 20rpx;">
+            <text>{{appStore.userInfo.nickname}}</text>
+            <text v-if="appStore.userInfo.memberGrade == 1">（VIP）</text>
         </view>
         
         
@@ -39,8 +33,8 @@
             </view>
         </view>
         
-        <view class="member-wrap">
-            <app-img src="/static/mine/11.png" w="742" h="562"></app-img>
+        <view class="member-wrap" v-if="!parseInt(appStore.userInfo.memberGrade)">
+            <app-member @fail="onAuth" />
         </view>
         
         <view class="opt-list">
@@ -88,6 +82,7 @@
         }
     }
     
+    
     function onPreview() {
         // popup.show = true
         if (!appStore.hasLogin) {
@@ -125,44 +120,11 @@
 </style>
 <style scoped lang="scss">
     .page-wrap {
-        .info {
-            display: flex;
-            align-items: center;
-            .left {
-                position: relative;
-                .avatar {
-                    position: absolute;
-                    width: 108rpx;
-                    height: 108rpx;
-                    left: 0;
-                    right: 0;
-                    top: 0;
-                    bottom: 0;
-                    margin: auto;
-                }
-            }
-            .right {
-                flex: 1;
-                .name {
-                    font-size: 36rpx;
-                    text {
-                        padding: 20rpx 0;
-                        padding-left: 10rpx;
-                        padding-right: 30rpx;
-                    }
-                }
-                .phone {
-                    font-size: 28rpx;
-                    padding-top: 10rpx;
-                }
-            }
-        }
-        
-        .avatar {
+        .avatar-wrap {
             margin-top: -72rpx;
         }
         .amount-wrap {
-            padding-top: 56rpx;
+            padding: 56rpx 0 40rpx;
             .item {
                 width: 33.33%;
                 text-align: center;
@@ -177,7 +139,9 @@
             }
         }
         .member-wrap {
-            padding-top: 40rpx;
+            margin: 0 24rpx;
+            overflow: hidden;
+            border-radius: 16rpx;
         }
         .opt-list {
             padding: 0 24rpx;

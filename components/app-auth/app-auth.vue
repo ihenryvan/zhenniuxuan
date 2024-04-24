@@ -21,9 +21,19 @@
             </view>
 
             <!-- 确定按钮 -->
-            <button class="submit-btn" v-if="userInfo.nickname && userInfo.avatar" open-type="getPhoneNumber"
+            <button class="submit-btn" v-if="userInfo.nickname && userInfo.avatar && !!agreeVal.length" open-type="getPhoneNumber"
                 @getphonenumber.stop="getPhoneNumber">确 定</button>
             <view class="submit-btn" v-else @tap.stop="submitUserInfo">确 定</view>
+            
+            <view class="protocal-wrap">
+            	<u-checkbox-group v-model="agreeVal">
+            		<u-checkbox shape="circle" activeColor="#E6212B" iconSize="36rpx" />
+            	</u-checkbox-group>
+            	<text>我已阅读并同意</text>
+            	<text class="protocol" @tap="goProtocol('user_agreement')">《用户服务协议》</text>
+            	<text>和</text>
+            	<text class="protocol" @tap="goProtocol('privacy_policy')">《隐私政策》</text>
+            </view>
         </view>
     </view>
 </template>
@@ -39,6 +49,8 @@
     let show = ref(false)
     let userInfo = reactive({})
     let params = {}
+    let agreeVal = ref([])
+    
     
     function open() {
         if (!params.openid) {
@@ -89,6 +101,13 @@
                 title: '请输入用户名'
             })
         }
+        if (!agreeVal.value.length) {
+            return uni.showToast({
+                icon: 'none',
+                title: '请先同意《用户服务协议》和《隐私政策》'
+            })
+        }
+        
     }
 
     function getPhoneNumber(evt) {
@@ -108,21 +127,22 @@
         let queryData = {
             iv,
             encryptedData,
-            openId: params.openid,
-            session_key: params.sessionKey,
-            avatarUrl: userInfo.avatar,
-            nickName: userInfo.nickname,
+            openid: params.openid,
+            sessionKey: params.sessionKey,
+            // avatarUrl: userInfo.avatar,
+            // nickName: userInfo.nickname,
         }
         
         uni.showLoading({
             title: '授权中'
         })
-        auth.decryptUserInfo(queryData).then(async data => {
+        auth.getPhone(queryData).then(async data => {
             data.openId = params.openid
-            // let info = await setUserInfo(data)
+            let info = await setUserInfo(data)
             
-            data.nickname = data.nickname
-            data.headPath = data.avatar
+            data.nickname = userInfo.nickname
+            data.avatar = userInfo.avatar
+            
             appStore.storeUserInfo(data)
             emit('authed', data)
             close()
@@ -136,7 +156,7 @@
             let params = {
                 token: info.token,
                 nickname: userInfo.nickname,
-                headPath: userInfo.avatar
+                avatar: userInfo.avatar
             }
             auth.updateUserInfo(params).then(data => {
                 resolve(data)
@@ -155,7 +175,7 @@
             filePath: tempPath,
             success: fileRes => {
                 let data = JSON.parse(fileRes.data)
-                userInfo.avatar = data.code === 0 ? data.fileName : ''
+                userInfo.avatar = data.code === 200 ? data.fileName : ''
                 console.log(888, userInfo.avatar);
             },
             fail: err => {
@@ -164,6 +184,12 @@
                     title: '头像上传失败'
                 })
             }
+        })
+    }
+    
+    function goProtocol(type) {
+        uni.navigateTo({
+            url: `/pages/mine/protocol?type=${type}`
         })
     }
 
@@ -200,8 +226,8 @@
             background-color: #FFFFFF;
             border-radius: 20rpx 20rpx 0 0;
             padding: 50rpx 40rpx 40rpx;
-            padding-bottom: calc(constant(safe-area-inset-bottom) + 40rpx);
-            padding-bottom: calc(env(safe-area-inset-bottom) + 40rpx);
+            // padding-bottom: calc(constant(safe-area-inset-bottom) + 20rpx);
+            // padding-bottom: calc(env(safe-area-inset-bottom) + 20rpx);
             transform-origin: center bottom;
             transform: scaleY(0);
             animation: showWrapper 0.25s ease 0.1s forwards;
@@ -283,7 +309,7 @@
             width: 100%;
             height: 100rpx;
             color: #FFFFFF;
-            background: #0066ff;
+            background: #E6212B;
             margin-top: 60rpx;
             border-radius: 10rpx;
             font-size: 34rpx;
@@ -291,6 +317,24 @@
             align-items: center;
             justify-content: center;
         }
+    }
+    
+    .protocal-wrap {
+    	display: flex;
+    	text-align: center;
+    	justify-content: center;
+    	flex-flow: wrap row;
+        align-items: center;
+    	margin-top: 30rpx;
+    
+    	text {
+    		font-size: 26rpx;
+    		letter-spacing: 0;
+    	}
+    	.protocol {
+    		color: #FF623D;
+    		text-decoration: underline;
+    	}
     }
 
     @keyframes showMask {

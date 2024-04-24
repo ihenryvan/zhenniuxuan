@@ -32,7 +32,7 @@
             
             <view class="bar-wrap app-flex space-between">
                 <view class="item app-flex-center">
-                    <app-img src="/static/home/bar-icon0.png" w="68" h="68"></app-img>
+                    <app-img src="/static/home/bar-icon0.png" w="78" h="78"></app-img>
                     <text>公司介绍</text>
                 </view>
                 <view class="item app-flex-center">
@@ -118,9 +118,9 @@ function onLeftClick() {}
         .grid-list {
             background: #fff;
             border-radius: 16rpx;
-            padding: 30rpx 0;
+            padding: 30rpx 0 20rpx 0;
             .grid-text {
-                margin-top: 12rpx;
+                margin: 12rpx 0 20rpx 0;
                 font-size: 28rpx;
             }
         }
@@ -130,8 +130,8 @@ function onLeftClick() {}
                 width: 48.5%;
                 background: #fff;
                 border-radius: 16rpx;
-                font-size: 28rpx;
-                padding: 10rpx 0;
+                font-size: 32rpx;
+                padding: 16rpx 0;
                 text {
                     margin-left: 16rpx;
                 }

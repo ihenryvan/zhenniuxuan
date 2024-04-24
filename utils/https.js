@@ -19,10 +19,11 @@ function request(url, data, method, headers) {
 		let userInfo = uni.getStorageSync('userInfo');
         let params = data || {}
         
-		if (userInfo && !params.token) {
-			http.headers.token = userInfo.token
-            params.token = userInfo.token
-		}
+		if (params.token) {
+			http.headers.Authorization = `${params.token}`
+		} else if (userInfo?.token) {
+            http.headers.Authorization = `${userInfo.token}`
+        }
 
 		uni.request({
 			url: url.startsWith('http') ? url : (http.baseUrl + url),
@@ -32,7 +33,7 @@ function request(url, data, method, headers) {
 			sslVerify: false,
 			success: (res) => {
 				//
-				if(res.data.code == 0){
+				if(res.data.code == 200){
 					resolve(res.data.data || res.data.regeocode)
 					return false
 				}

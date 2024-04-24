@@ -1,15 +1,22 @@
 <template>
     <u-navbar bgColor="#fff" title="设置" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
-        <app-img src="/static/mine/member.png" w="750" h="760"></app-img>
+        <view class="label">当前等级</view>
+        <view class="value">{{!parseInt(appStore.userInfo.memberGrade) ? '注册会员' : 'VIP会员'}}</view>
+        
+        <view class="member-wrap" v-if="!parseInt(appStore.userInfo.memberGrade)">
+            <app-member @fail="onAuth" />
+        </view>
     </view>
     
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
+import { userAppStore } from '@/store/app'
 import { getVideo } from '@/api/photo'
 
+let appStore = userAppStore()
 let popup = reactive({
     show: false,
 })
@@ -31,12 +38,28 @@ function onPreview(no) {
 
 <style lang="scss">
     page {
-        background: #f7f8fa;
+        background: #F7F8FA;
     }
 </style>
 <style scoped lang="scss">
     .page-wrap {
-        padding-top: 30rpx;
+        padding: 30rpx 0;
         background: #fff;
+        
+        .label, .value {
+            padding-left: 30rpx;
+            padding-bottom: 30rpx;
+        }
+        .label {
+            font-size: 28rpx;
+        }
+        .value {
+            font-size: 36rpx;
+        }
+        .member-wrap {
+            margin: 0 24rpx;
+            overflow: hidden;
+            border-radius: 16rpx;
+        }
     }
 </style>
