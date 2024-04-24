@@ -32,18 +32,38 @@
         </view>
         
         <view class="goods-list">
-            <view class="goods-cate">
-                <view class="cate-title">热销推荐</view>
+            <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
+                <view class="cate-title">{{cate.name}}</view>
                 <view class="list">
-                    <view class="item">
-                        <app-img src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
+                    <view class="item" v-for="(good, goodIndex) in cate.list">
+                        <app-img class="img" radius="8" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
                         <view class="intro">
-                            <view class="name"></view>
-                            <view class="price">
+                            <view class="name">2024款 原切澳洲安格斯 M3+上脑牛排</view>
+                            <view class="m-price">
                                 <view class="left">臻会员价</view>
                                 <view class="right">￥17.98</view>
                             </view>
-                            view.
+                            <view class="bottom">
+                                <view class="price">
+                                    <text>￥</text>
+                                    <view class="val">18.96</view>
+                                </view>
+                                <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
+                                    <template #minus>
+                                        <view class="minus">
+                                            <u-icon name="minus-circle-fill" color="#333" size="18"></u-icon>
+                                        </view>
+                                    </template>
+                                    <template #input>
+                                        <text class="amount">{{good.num}}</text>
+                                    </template>
+                                    <template #plus>
+                                        <view class="plus">
+                                            <u-icon name="plus-circle-fill" color="#333" size="18"></u-icon>
+                                        </view>
+                                    </template>
+                                </u-number-box>
+                            </view>
                         </view>
                     </view>
                 </view>
@@ -69,12 +89,24 @@ let popup = reactive({
 })
 
 let list = ref([])
+let goodsList = ref([
+    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
+    { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
+])
 
 // getVideo().then(data => {
 //     if (data?.length) {
 //         list.value = data
 //     }
 // })
+
+
+function updateCarNum(e) {
+    let indexArr = e.name.split('-')
+    let val = e.value
+    
+    goodsList.value[indexArr[0]].list[indexArr[1]].num = val
+}
 
 function onPreview(no) {
     // popup.show = true
@@ -133,6 +165,28 @@ function onPreview(no) {
                 }
                 .label {
                     font-size: 24rpx;
+                }
+            }
+        }
+        .goods-list {
+            padding-left: 190rpx;
+            .cate-title {
+                padding: 30rpx 0;
+                font-size: 32rpx;
+            }
+            .item {
+                position: relative;
+                .img {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                }
+                .intro {
+                    padding-left: 196rpx;
+                    .name {
+                        font-size: 28rpx;
+                        min-height: 40rpx;
+                    }
                 }
             }
         }
