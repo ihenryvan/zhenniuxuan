@@ -1,93 +1,97 @@
 <template>
     <view class="page-wrap">
-        <u-sticky>
-            <u-navbar bgColor="#fff" title="点肉" leftIcon="" :placeholder="true" />
-            <view class="info-wrap">
-                <view class="shop-info app-flex align-center">
-                    <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
-                    <view class="name">牛气无语（龙华清湖店）</view>
-                    <u-icon class="icon" name="arrow-right" size="16" color="#333" />
-                </view>
-                <view class="doc-info app-flex align-center">
-                    <u-icon name="map" size="18" color="#666" />
-                    <text>距离您14.10km</text>
-                </view>
+        <u-navbar bgColor="#fff" title="点肉" leftIcon="" :placeholder="true" />
+        <view class="info-wrap">
+            <view class="shop-info app-flex align-center">
+                <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
+                <view class="name">牛气无语（龙华清湖店）</view>
+                <u-icon class="icon" name="arrow-right" size="16" color="#333" />
             </view>
-        </u-sticky>
-        
-        <view class="work-info">
-            <app-img src="/static/booking/info-bg.png" w="680" h="114"></app-img>
-            <view class="work-info-cont app-flex space-between align-center">
-                <view class="left">
-                    <view class="item1">营业时间：08:30-21:30</view>
-                    <view class="item2">地址：侨北一街橡皮树创意坊D1-4号</view>
-                </view>
-                <view class="right">
-                    <view class="app-flex-center">
-                        <u-icon name="phone" size="26" color="#333" />
-                    </view>
-                    <view class="label">联系门店</view>
-                </view>
+            <view class="doc-info app-flex align-center">
+                <u-icon name="map" size="18" color="#666" />
+                <text>距离您14.10km</text>
             </view>
         </view>
         
-        <view class="nav-list">
-            <view class="item">
-                <view class="img app-flex-center">
-                    <app-img src="/static/booking/icon-hot.png" w="64" h="64"></app-img>
+        <u-transition :show="isShowRefer" mode="slide-down">
+            <view class="work-info" id="reference">
+                <app-img src="/static/booking/info-bg.png" w="680" h="114"></app-img>
+                <view class="work-info-cont app-flex space-between align-center">
+                    <view class="left">
+                        <view class="item1">营业时间：08:30-21:30</view>
+                        <view class="item2">地址：侨北一街橡皮树创意坊D1-4号</view>
+                    </view>
+                    <view class="right">
+                        <view class="app-flex-center">
+                            <u-icon name="phone" size="26" color="#333" />
+                        </view>
+                        <view class="label">联系门店</view>
+                    </view>
                 </view>
-                <view class="name">热销推荐</view>
+            </view>
+        </u-transition>
+        
+        <view class="scroll-wrap" :style="`top: ${isShowRefer ? referInfo.bottom+14 : referInfo.bottom-referInfo.height}px; transition: all ${isInitial ? 0.3 : 0}s;`">
+            <view class="nav-list">
+                <scroll-view scroll-y class="scroll-cont">
+                    <view class="item">
+                        <view class="img app-flex-center">
+                            <app-img src="/static/booking/icon-hot.png" w="64" h="64"></app-img>
+                        </view>
+                        <view class="name">热销推荐</view>
+                    </view>
+                    
+                    <view class="item">
+                        <view class="img app-flex-center">
+                            <app-img src="/static/booking/icon-meat0.png" w="64" h="64"></app-img>
+                        </view>
+                        <view class="name">烤肉类</view>
+                    </view>
+                </scroll-view>
             </view>
             
-            <view class="item">
-                <view class="img app-flex-center">
-                    <app-img src="/static/booking/icon-meat0.png" w="64" h="64"></app-img>
-                </view>
-                <view class="name">烤肉类</view>
-            </view>
-        </view>
-        
-        <view class="goods-list">
-            <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
-                <view class="cate-title">{{cate.name}}</view>
-                <view class="list">
-                    <view class="item" v-for="(good, goodIndex) in cate.list">
-                        <app-img class="img" radius="8" @click="onDetail" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
-                        <view class="intro">
-                            <view class="name" @click="onDetail">2024款 原切澳洲安格斯 M3+上脑牛排</view>
-                            <view class="m-price app-flex" @click="onDetail">
-                                <view class="left">臻会员价</view>
-                                <view class="right">￥17.98</view>
-                            </view>
-                            <view class="bottom app-flex align-center space-between">
-                                <view class="price app-flex">
-                                    <text>￥</text>
-                                    <view class="val">18.96</view>
+            <view class="goods-list">
+                <scroll-view scroll-y class="scroll-cont" @scroll="onRightScroll">
+                    <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
+                        <view class="cate-title">{{cate.name}}</view>
+                        <view class="list">
+                            <view class="item" v-for="(good, goodIndex) in cate.list">
+                                <app-img class="img" radius="8" @click="onDetail" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
+                                <view class="intro">
+                                    <view class="name" @click="onDetail">2024款 原切澳洲安格斯 M3+上脑牛排</view>
+                                    <view class="m-price app-flex" @click="onDetail">
+                                        <view class="left">臻会员价</view>
+                                        <view class="right">￥17.98</view>
+                                    </view>
+                                    <view class="bottom app-flex align-center space-between">
+                                        <view class="price app-flex">
+                                            <text>￥</text>
+                                            <view class="val">18.96</view>
+                                        </view>
+                                        
+                                        <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
+                                            <template #minus v-if="good.num > 0">
+                                                <view class="minus">
+                                                    <u-icon name="minus-circle" color="#999" size="24"></u-icon>
+                                                </view>
+                                            </template>
+                                            <template #input v-show="good.num > 0">
+                                                <text class="amount">{{good.num || ''}}</text>
+                                            </template>
+                                            <template #plus>
+                                                <view class="plus">
+                                                    <u-icon name="plus-circle-fill" color="#E6212B" size="24"></u-icon>
+                                                </view>
+                                            </template>
+                                        </u-number-box>
+                                    </view>
                                 </view>
-                                
-                                <u-icon name="plus-circle-fill" color="#E6212B" size="22"></u-icon>
-                                <!-- <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
-                                    <template #minus>
-                                        <view class="minus">
-                                            <u-icon name="minus-circle" color="#999" size="22"></u-icon>
-                                        </view>
-                                    </template>
-                                    <template #input>
-                                        <text class="amount">{{good.num}}</text>
-                                    </template>
-                                    <template #plus>
-                                        <view class="plus">
-                                            <u-icon name="plus-circle-fill" color="#E6212B" size="22"></u-icon>
-                                        </view>
-                                    </template>
-                                </u-number-box> -->
                             </view>
                         </view>
                     </view>
-                </view>
+                </scroll-view>
             </view>
         </view>
-        
         
         <view class="cart-warp app-flex align-center">
             <view class="cart">
@@ -97,31 +101,86 @@
                 <text>￥</text>
                 <view class="val">18.9</view>
             </view>
-            <view class="btn app-flex-center" @click="goPay">立即下单</view>
+            <view class="btn app-flex-center" @click="goPay">立即下单{{cartLen}}</view>
         </view>
     </view>
     
-    <u-popup :show="popup.show">
+    <!-- <u-popup :show="popup.show">
         <view class="detail-popup">
             <view class="close" @click="closeDetailPopup"></view>
             <app-img src="/static/booking/test.png" w="750" h="1400"></app-img>
         </view>
-    </u-popup>
+    </u-popup> -->
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { getVideo } from '@/api/photo'
 
-let popup = reactive({
-    show: false,
+
+let isInitial = ref(false)
+let referInfo = reactive({
+    bottom: 0,
+    height: 0,
 })
+let isShowRefer = ref(true)
 
 let list = ref([])
 let goodsList = ref([
-    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
-    { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
+    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '吊龙肉', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '肋条肉', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '牛腱子肉', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '牛腩肉', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '雪花肉', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '烤全牛', list: [{num: 0}, {num: 0}, {num: 0}] },
 ])
+let cartLen = computed(() => {
+    return goodsList.value.reduce((tol1, cur1) => {
+        let val = cur1.list.reduce((tol2, cur2) => {
+            return tol2 + cur2.num
+        }, 0)
+        return tol1 + val;
+    }, 0)
+})
+// let popup = reactive({
+//     show: false,
+// })
+
+initPage()
+
+function initPage() {
+    uni.createSelectorQuery().select('#reference').fields({
+        size: true,
+        rect: true,
+    }, data => {
+        referInfo.bottom = data.bottom
+        referInfo.height = data.height
+    }).exec()
+    
+    setTimeout(() => {
+        isInitial.value = true
+    }, 1000)
+}
+
+function onRightScroll(e) {
+    let {scrollTop} = e.detail
+    if (scrollTop > 10 && isShowRefer.value) {
+        isShowRefer.value = false
+    } else if (scrollTop <= 10 && !isShowRefer.value) {
+        isShowRefer.value = true
+    }
+}
+
+// uni.getSystemInfo({
+//     success(data) {
+//         console.log(456, data);
+//         console.log('windowHeight', data.windowHeight);
+//         console.log('statusBarHeight', data.statusBarHeight);
+//         console.log('screenTop', data.screenTop);
+//         console.log('screenHeight', data.screenHeight);
+//     }
+// })
 
 // getVideo().then(data => {
 //     if (data?.length) {
@@ -142,19 +201,13 @@ function goPay() {
         url: './pay'
     })
 }
-
 function updateCarNum(e) {
     let indexArr = e.name.split('-')
-    let val = e.value
     
-    // goodsList.value[indexArr[0]].list[indexArr[1]].num = val
-}
-
-function onPreview(no) {
-    // popup.show = true
-    uni.navigateTo({
-        url: `/pages/photo/detail?no=${no}`
-    })
+    console.log(456, e.value);
+    let val = e.value ?? 1
+    
+    goodsList.value[indexArr[0]].list[indexArr[1]].num = val
 }
 </script>
 
@@ -178,8 +231,10 @@ function onPreview(no) {
     }
     .page-wrap {
         .info-wrap {
+            position: relative;
             padding: 24rpx 30rpx;
             background: #fff;
+            z-index: 10;
             .shop-info {
                 .name {
                     font-size: 30rpx;
@@ -222,11 +277,21 @@ function onPreview(no) {
                 }
             }
         }
-        .nav-list {
-            position: fixed;
+        .scroll-wrap {
+            position: absolute;
+            bottom: 0;
             left: 0;
-            top: 440rpx;
-            bottom: 0rpx;
+            right: 0;
+            background: #fff;
+            .scroll-cont {
+                height: 100%;
+            }
+        }
+        .nav-list {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
             min-width: 160rpx;
             background: #F6F6F6;
             padding-top: 20rpx;
@@ -239,12 +304,18 @@ function onPreview(no) {
             }
         }
         .goods-list {
-            padding-left: 190rpx;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 564rpx;
             padding-right: 24rpx;
-            padding-bottom: 130rpx;
             .cate-title {
                 padding: 30rpx 0;
                 font-size: 32rpx;
+            }
+            .goods-cate:first-child .cate-title {
+                padding-top: 10rpx;
             }
             .item {
                 position: relative;
@@ -296,7 +367,7 @@ function onPreview(no) {
                             }
                         }
                         .amount {
-                            min-width: 50rpx;
+                            min-width: 60rpx;
                             text-align: center;
                         }
                     }

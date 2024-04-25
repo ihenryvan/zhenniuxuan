@@ -73,6 +73,9 @@
             return emit('fail')
         }
         
+        uni.showLoading({
+            title: '正在拉起支付'
+        })
         applyVip().then(data => {
             uni.requestPayment({
                 provider: 'wxpay',
@@ -82,13 +85,15 @@
                 signType: data.signMap.signType,
                 paySign: data.signMap.paySign,
                 success: function(res) {
+                    updateInfo()
                     console.log('success:' + JSON.stringify(res));
                 },
                 fail: function(err) {
                     console.log('fail:' + JSON.stringify(err));
-                    updateInfo()
                 }
-            });
+            })
+        }).finally(() => {
+            uni.hideLoading()
         })
     }
     
@@ -99,7 +104,7 @@
                 let userInfo = { ...appStore.userInfo }
                 
                 userInfo.memberGrade = data.memberGrade
-                appStore.storeUserInfo(data.user)
+                appStore.storeUserInfo(userInfo)
             }
         })
     }
