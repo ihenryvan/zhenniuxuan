@@ -17,7 +17,7 @@
             </template>
         </u-navbar>
         
-        <app-img src="/static/home/top-bg.png" w="750" h="678"></app-img>
+        <app-img src="/static/home/top-bg.png" w="750" h="678" @click="detailRef.open()"></app-img>
         <view class="page-cont">
             <view class="grid-list">
                 <u-grid :border="false">
@@ -63,12 +63,15 @@
             </view>
         </view>
     </view>
+    
+    <app-goods-detail ref="detailRef" />
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 // import { getShopList } from '@/api/home'
 
+let detailRef = ref(null)
 let phone = ref('15338841454')
 let popup = reactive({
     show: false,

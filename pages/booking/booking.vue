@@ -51,8 +51,9 @@
             <view class="goods-list">
                 <scroll-view scroll-y class="scroll-cont" @scroll="onRightScroll" :scroll-top="goodsScrollTop" scroll-with-animation>
                     <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
-                        <view class="cate-title" :id="`title${cateIndex}`">{{cate.name}}</view>
-                        <view class="list">
+                        <view class="cate-title" :id="`title${cateIndex}`">{{cate.categoryName}}</view>
+                        <view class="no-goods" v-if="!cate.gList || cate.gList.length === 0">该分类下暂无商品</view>
+                        <view class="list" v-else>
                             <view class="item" v-for="(good, goodIndex) in cate.gList">
                                 <app-img class="img" radius="8" @click="onDetail" :src="good.image" w="176" h="176"></app-img>
                                 <view class="intro">
@@ -64,7 +65,7 @@
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
                                             <text>￥</text>
-                                            <view class="val">{{good.price}}</view>
+                                            <view class="val">{{good.originPrice}}</view>
                                         </view>
                                         
                                         <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
@@ -105,12 +106,13 @@
                     <text>￥</text>
                     <view class="val">18.9</view>
                 </view>
-                <view class="btn app-flex-center" @click="goPay">立即下单</view>
+                <!-- <view class="btn app-flex-center" @click="goPay">立即下单</view> -->
+                <view class="btn app-flex-center" @click="detailRef.open">立即下单</view>
             </view>
         </u-transition>
     </view>
     
-    <app-goods-detail  />
+    <app-goods-detail ref="detailRef" />
     <!-- <u-popup :show="popup.show">
         <view class="detail-popup">
             <view class="close" @click="closeDetailPopup"></view>
@@ -120,7 +122,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, watch } from 'vue'
+import { reactive, ref, computed, watch, nextTick } from 'vue'
 import { userAppStore } from '@/store/app'
 import { getShopCate, getGoods } from '@/api/home'
 
@@ -137,19 +139,6 @@ let referInfo = reactive({
 })
 let isShowRefer = ref(true)
 let cateList = ref([])
-let goodsList0 = ref([
-    { name: '热销推荐', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '吊龙肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '肋条肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '牛腱子肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '牛腩肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '雪花肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '烤全牛', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '牛外脊', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '三岔肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '牛排', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-    { name: '牛精肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
-])
 let goodsList = ref([])
 let isNotRunScroll = false
 // let cateList = computed(() => {
@@ -163,6 +152,7 @@ let cartLen = computed(() => {
         return tol1 + val;
     }, 0)
 })
+let detailRef = ref(null)
 watch(currCateIndex, index => {
     let calTop = cateList.value[index].calTop
     console.log(calTop);
@@ -207,11 +197,15 @@ function getListData(storeId) { // 原来叫getCateList
         })
         
         Promise.all(pArr).then(() => {
-            console.log(list);
             isInitial.value = true
             goodsList.value = list
-            // calTitleLoc()
-            // calCateLoc()
+            
+            nextTick(() => {
+                setTimeout(() => {
+                    calTitleLoc()
+                    calCateLoc()
+                }, 500)
+            })
         })
     })
 }
@@ -223,7 +217,7 @@ function calTitleLoc() {
             size: true,
             rect: true,
         }, data => {
-            // console.log(`top: ${data.top-referInfo.bottom-referInfo.gap} ||| bottom: ${data.bottom} ||| left: ${data.left} ||| height: ${data.height}`);
+            console.log(`top: ${data.top-referInfo.bottom-referInfo.gap} ||| bottom: ${data.bottom} ||| left: ${data.left} ||| height: ${data.height}`);
             item.calTop = index == 0 ? 0 : data.top-referInfo.bottom-referInfo.gap+6
             // if (data && data.height >= 0) {
             //     item.top = h
@@ -255,6 +249,7 @@ function onRightScroll(e) {
     
     if (isNotRunScroll) return
     let index = goodsList.value.findIndex(item => item.calTop > scrollTop)
+    console.log(index);
     currCateIndex.value = index == 0 ? 0 : index - 1
 }
 
@@ -314,10 +309,9 @@ function goPay() {
 }
 function updateCarNum(e) {
     let indexArr = e.name.split('-')
-    
     let val = e.value ?? 1
     
-    goodsList.value[indexArr[0]].list[indexArr[1]].num = val
+    goodsList.value[indexArr[0]].gList[indexArr[1]].num = val
 }
 </script>
 
@@ -433,6 +427,11 @@ function updateCarNum(e) {
             .cate-title {
                 padding: 30rpx 0;
                 font-size: 32rpx;
+            }
+            .no-goods {
+                color: #666;
+                font-size: 28rpx;
+                text-align: center;
             }
             .goods-cate:first-child .cate-title {
                 padding-top: 10rpx;
