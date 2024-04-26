@@ -34,7 +34,7 @@ function request(url, data, method, headers) {
 			success: (res) => {
 				//
 				if(res.data.code == 200){
-					resolve(res.data.data || res.data.regeocode)
+					resolve(res.data.data || res.data.rows || res.data.regeocode)
 					return false
 				}
 				

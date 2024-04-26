@@ -2,15 +2,17 @@
     <view class="page-wrap">
         <u-navbar bgColor="#fff" title="点肉" leftIcon="" :placeholder="true" />
         <view class="info-wrap">
-            <view class="shop-info app-flex align-center">
-                <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
-                <view class="name">牛气无语（龙华清湖店）</view>
-                <u-icon class="icon" name="arrow-right" size="16" color="#333" />
+            <view class="shop-info app-flex">
+                <view class="app-flex align-center" @click="goMap">
+                    <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
+                    <view class="name">{{shopInfo.storeName}}</view>
+                    <u-icon class="icon" name="arrow-right" size="16" color="#333" />
+                </view>
             </view>
-            <view class="doc-info app-flex align-center">
+            <!-- <view class="doc-info app-flex align-center">
                 <u-icon name="map" size="18" color="#666" />
-                <text>距离您14.10km</text>{{goodsScrollTop}}
-            </view>
+                <text>距离您14.10km</text>
+            </view> -->
         </view>
         
         <u-transition :show="isShowRefer" mode="slide-down">
@@ -18,10 +20,10 @@
                 <app-img src="/static/booking/info-bg.png" w="680" h="114"></app-img>
                 <view class="work-info-cont app-flex space-between align-center">
                     <view class="left">
-                        <view class="item1">营业时间：08:30-21:30</view>
-                        <view class="item2">地址：侨北一街橡皮树创意坊D1-4号</view>
+                        <view class="item1">营业时间：{{shopInfo.openTime}}-{{shopInfo.closeTime}}</view>
+                        <view class="item2 app-ellipsis">地址：{{shopInfo.address}}</view>
                     </view>
-                    <view class="right">
+                    <view class="right" @click="onCall">
                         <view class="app-flex-center">
                             <u-icon name="phone" size="26" color="#333" />
                         </view>
@@ -36,9 +38,10 @@
                 <scroll-view scroll-y class="scroll-cont" :scroll-top="cateScrollTop" scroll-with-animation>
                     <view class="item" :id="`cate${cateIndex}`" :class="{active: cateIndex == currCateIndex}" v-for="(cate, cateIndex) in cateList" @click="onChangeCate(cateIndex)">
                         <view class="img app-flex-center">
-                            <app-img :src="`/static/booking/${cateIndex == 0 ? 'icon-hot' : 'icon-meat'+cateIndex%4}.png`" w="64" h="64"></app-img>
+                            <!-- <app-img :src="`/static/booking/${cateIndex == 0 ? 'icon-hot' : 'icon-meat'+cateIndex%4}.png`" w="64" h="64"></app-img> -->
+                            <app-img :src="cate.categoryImage" w="64" h="64"></app-img>
                         </view>
-                        <view class="name">{{cate.name}}</view>
+                        <view class="name">{{cate.categoryName}}</view>
                     </view>
                     <u-gap height="20rpx" />
                     <u-gap v-if="cartLen > 0" height="130rpx" />
@@ -50,13 +53,13 @@
                     <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
                         <view class="cate-title" :id="`title${cateIndex}`">{{cate.name}}</view>
                         <view class="list">
-                            <view class="item" v-for="(good, goodIndex) in cate.list">
-                                <app-img class="img" radius="8" @click="onDetail" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
+                            <view class="item" v-for="(good, goodIndex) in cate.gList">
+                                <app-img class="img" radius="8" @click="onDetail" :src="good.image" w="176" h="176"></app-img>
                                 <view class="intro">
-                                    <view class="name" @click="onDetail">2024款 原切澳洲安格斯 M3+上脑牛排</view>
+                                    <view class="name" @click="onDetail">{{good.title}}</view>
                                     <view class="m-price app-flex" @click="onDetail">
                                         <view class="left">臻会员价</view>
-                                        <view class="right">￥17.98</view>
+                                        <view class="right">￥{{good.vipDiscount}}</view>
                                     </view>
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
@@ -107,6 +110,7 @@
         </u-transition>
     </view>
     
+    <app-goods-detail  />
     <!-- <u-popup :show="popup.show">
         <view class="detail-popup">
             <view class="close" @click="closeDetailPopup"></view>
@@ -117,8 +121,11 @@
 
 <script setup>
 import { reactive, ref, computed, watch } from 'vue'
-import { getVideo } from '@/api/photo'
+import { userAppStore } from '@/store/app'
+import { getShopCate, getGoods } from '@/api/home'
 
+let appStore = userAppStore()
+let shopInfo = appStore.shopInfo
 let isInitial = ref(false)
 let currCateIndex = ref(0)
 let cateScrollTop = ref(0)
@@ -129,7 +136,8 @@ let referInfo = reactive({
     height: 0,
 })
 let isShowRefer = ref(true)
-let goodsList = ref([
+let cateList = ref([])
+let goodsList0 = ref([
     { name: '热销推荐', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '吊龙肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '肋条肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
@@ -142,12 +150,14 @@ let goodsList = ref([
     { name: '牛排', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '牛精肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
 ])
-let cateList = computed(() => {
-    return goodsList.value.map(item => ({ name: item.name }))
-})
+let goodsList = ref([])
+let isNotRunScroll = false
+// let cateList = computed(() => {
+//     return goodsList.value.map(item => ({ name: item.name }))
+// })
 let cartLen = computed(() => {
     return goodsList.value.reduce((tol1, cur1) => {
-        let val = cur1.list.reduce((tol2, cur2) => {
+        let val = cur1.gList.reduce((tol2, cur2) => {
             return tol2 + cur2.num
         }, 0)
         return tol1 + val;
@@ -155,8 +165,11 @@ let cartLen = computed(() => {
 })
 watch(currCateIndex, index => {
     let calTop = cateList.value[index].calTop
-    if (calTop > 250) {
+    console.log(calTop);
+    if (calTop > 198) {
         cateScrollTop.value = calTop - 250
+    } else if (calTop < 100) {
+        cateScrollTop.value = 0
     }
 })
 // let popup = reactive({
@@ -166,6 +179,8 @@ watch(currCateIndex, index => {
 initPage()
 
 function initPage() {
+    getListData(shopInfo.id)
+    
     uni.createSelectorQuery().select('#reference').fields({
         size: true,
         rect: true,
@@ -173,12 +188,32 @@ function initPage() {
         referInfo.bottom = data.bottom
         referInfo.height = data.height
     }).exec()
-    
-    setTimeout(() => {
-        isInitial.value = true
-        calTitleLoc()
-        calCateLoc()
-    }, 1000)
+}
+
+function getListData(storeId) { // 原来叫getCateList
+    getShopCate({storeId}).then(list => {
+        if (list.length === 0) return
+        
+        cateList.value = JSON.parse(JSON.stringify(list))
+        
+        let pArr = []
+        list.forEach(item => {
+            pArr.push(getGoods({ storeId, cateId: item.id }).then(gList => {
+                gList.forEach(g => {
+                    g.num = 0
+                })
+                item.gList = gList
+            }))
+        })
+        
+        Promise.all(pArr).then(() => {
+            console.log(list);
+            isInitial.value = true
+            goodsList.value = list
+            // calTitleLoc()
+            // calCateLoc()
+        })
+    })
 }
 
 function calTitleLoc() {
@@ -218,14 +253,34 @@ function onRightScroll(e) {
         isShowRefer.value = true
     }
     
+    if (isNotRunScroll) return
     let index = goodsList.value.findIndex(item => item.calTop > scrollTop)
     currCateIndex.value = index == 0 ? 0 : index - 1
 }
 
 function onChangeCate(index) {
     currCateIndex.value = index
-    
     goodsScrollTop.value = goodsList.value[index].calTop
+    
+    isNotRunScroll = true
+    setTimeout(() => {
+        isNotRunScroll = false
+    }, 500)
+}
+
+function goMap() {
+    uni.openLocation({
+        latitude: Number(shopInfo.latitude),
+        longitude: Number(shopInfo.longitude),
+        name: shopInfo.storeName,
+        address: shopInfo.address
+    })
+}
+
+function onCall() {
+    uni.makePhoneCall({
+    	phoneNumber: shopInfo.telephone
+    })
 }
 
 // uni.getSystemInfo({
@@ -320,6 +375,9 @@ function updateCarNum(e) {
                 top: 0;
                 bottom: 0;
                 padding: 0 20rpx;
+                .left {
+                    max-width: 500rpx;
+                }
                 .item1 {
                     font-size: 26rpx;
                 }
@@ -361,6 +419,7 @@ function updateCarNum(e) {
                 .name {
                     font-size: 28rpx;
                     text-align: center;
+                    padding-top: 10rpx;
                 }
             }
         }

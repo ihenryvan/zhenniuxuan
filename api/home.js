@@ -2,29 +2,24 @@
 
 import request from "../utils/https.js"
 
-// 电站列表
-export const getSiteList = data => {
-    return request.post('/api/site/distance', data)
+// 店铺列表
+export const getShopList = data => {
+    return request.get('/api/store/nearbyList', data)
 }
 
-// 电站详情
+// 店铺详情
 export const getSiteDetail = data => {
-    return request.post('/api/site/detail', data)
+    return request.get('/api/store/detail', data)
 }
 
-// 电桩列表
-export const getMachineList = data => {
-    return request.post('/api/machine/machines', data)
+// 店铺-商品分类
+export const getShopCate = data => {
+    return request.get('/api/product/categories', data)
 }
 
-// 电桩详情
-export const getMachineDetail = data => {
-    return request.post('/api/machine/detail', data)
-}
-
-// 费用详情
-export const feeList = data => {
-    return request.post('/api/fee/feeList', data)
+// 店铺-商品分类-商品
+export const getGoods = data => {
+    return request.get('/api/product/list', data)
 }
 
 export const geocode = data => {

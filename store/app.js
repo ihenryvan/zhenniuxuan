@@ -4,7 +4,10 @@ export const userAppStore = defineStore('app', {
     state: () => {
         return {
             hasLogin: false,
-            userInfo: {}
+            userInfo: {},
+            shopInfo: {
+                storeName: '45店铺'
+            }
         }
     },
     actions: {
@@ -13,5 +16,10 @@ export const userAppStore = defineStore('app', {
             this.userInfo = info
             uni.setStorageSync('userInfo', info)
         },
+        
+        storeShopInfo(info) {
+            this.shopInfo = info
+        }
+        
     },
 });

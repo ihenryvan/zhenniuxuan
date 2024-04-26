@@ -1,10 +1,13 @@
 <script>
+    import { storeToRefs } from 'pinia'
     import { userAppStore } from '@/store/app'
     import { getSession } from '@/api/auth'
+    import { getShopList } from '@/api/home'
     
     export default {
         onLaunch: function() {
-            // reStoreInfo()
+            getShopInfo() // 临时
+            reStoreInfo()
         },
         onShow: function() {
         },
@@ -25,6 +28,21 @@
                         data.openId = data.openid
                         appStore.storeUserInfo(data.user)
                     }
+                })
+            }
+        })
+    }
+    
+    function getShopInfo() {
+        getShopList({latitude: 22, longitude: 114}).then(data => {
+            let info = data[1] || {}
+            if (info.id) {
+                let appStore = userAppStore()
+                appStore.storeShopInfo(info)
+            } else {
+                uni.showToast({
+                    title: '缺少店铺信息',
+                    icon: 'none'
                 })
             }
         })

@@ -11,8 +11,8 @@
                 <view
                     class="app-flex-center"
                 >
-                    <u-icon name="map" color="#fff"></u-icon>
-                    <text style="font-size: 28rpx; color: #fff;">深圳</text>
+                    <!-- <u-icon name="map" color="#fff"></u-icon> -->
+                    <!-- <text style="font-size: 28rpx; color: #fff;">深圳</text> -->
                 </view>
             </template>
         </u-navbar>
@@ -67,7 +67,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getIndexList } from '@/api/index'
+// import { getShopList } from '@/api/home'
 
 let phone = ref('15338841454')
 let popup = reactive({
@@ -80,6 +80,9 @@ let gridList = ref(['吊龙', '肋条', '牛腱子', '牛腩', '牛肉', '雪花
 //         list.value = data
 //     }
 // })
+
+// getShopList({latitude: 22.67412, longitude: 114.035825})
+
 function goMeat() {
     uni.switchTab({
         url: '/pages/booking/booking'
