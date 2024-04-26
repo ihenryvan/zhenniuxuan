@@ -66,7 +66,7 @@
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
                                             <text>￥</text>
-                                            <view class="val">18.96</view>
+                                            <view class="val">{{good.price}}</view>
                                         </view>
                                         
                                         <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
@@ -89,20 +89,27 @@
                             </view>
                         </view>
                     </view>
+                    <u-gap height="20rpx" />
+                    <u-gap v-if="cartLen > 0" height="110rpx" />
                 </scroll-view>
             </view>
         </view>
         
-        <view class="cart-warp app-flex align-center">
-            <view class="cart">
-                <app-img src="/static/booking/icon-cart.png" w="104" h="104"></app-img>
+        <u-transition :show="cartLen > 0" mode="fade">
+            <view class="cart-warp app-flex align-center">
+                <view class="cart">
+                    <view class="num">
+                        <u-badge :value="cartLen" bgColor="#E6212B"></u-badge>
+                    </view>
+                    <app-img src="/static/booking/icon-cart.png" w="110" h="110"></app-img>
+                </view>
+                <view class="price app-flex app-flex-item">
+                    <text>￥</text>
+                    <view class="val">18.9</view>
+                </view>
+                <view class="btn app-flex-center" @click="goPay">立即下单</view>
             </view>
-            <view class="price app-flex app-flex-item">
-                <text>￥</text>
-                <view class="val">18.9</view>
-            </view>
-            <view class="btn app-flex-center" @click="goPay">立即下单{{cartLen}}</view>
-        </view>
+        </u-transition>
     </view>
     
     <!-- <u-popup :show="popup.show">
@@ -127,13 +134,13 @@ let isShowRefer = ref(true)
 
 let list = ref([])
 let goodsList = ref([
-    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '吊龙肉', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '肋条肉', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '牛腱子肉', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '牛腩肉', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '雪花肉', list: [{num: 0}, {num: 0}, {num: 0}] },
-    { name: '烤全牛', list: [{num: 0}, {num: 0}, {num: 0}] },
+    { name: '热销推荐', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '吊龙肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '肋条肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '牛腱子肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '牛腩肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '雪花肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '烤全牛', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
 ])
 let cartLen = computed(() => {
     return goodsList.value.reduce((tol1, cur1) => {
@@ -384,13 +391,20 @@ function updateCarNum(e) {
             height: 110rpx;
             background: #F6F6F6;
             .cart {
-                margin-left: 24rpx;
                 position: relative;
+                margin-left: 24rpx;
                 top: -24rpx;
+                .num {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    z-index: 1;
+                }
             }
             .price {
                 align-items: baseline;
                 padding-left: 30rpx;
+                margin-bottom: 6rpx;
                 text {
                     font-size: 24rpx;
                 }
