@@ -9,7 +9,7 @@
             </view>
             <view class="doc-info app-flex align-center">
                 <u-icon name="map" size="18" color="#666" />
-                <text>距离您14.10km</text>
+                <text>距离您14.10km</text>{{goodsScrollTop}}
             </view>
         </view>
         
@@ -31,29 +31,24 @@
             </view>
         </u-transition>
         
-        <view class="scroll-wrap" :style="`top: ${isShowRefer ? referInfo.bottom+14 : referInfo.bottom-referInfo.height}px; transition: all ${isInitial ? 0.3 : 0}s;`">
+        <view class="scroll-wrap" :style="`top: ${isShowRefer ? referInfo.bottom+referInfo.gap : referInfo.bottom-referInfo.height}px; transition: all ${isInitial ? 0.3 : 0}s;`">
             <view class="nav-list">
-                <scroll-view scroll-y class="scroll-cont">
-                    <view class="item">
+                <scroll-view scroll-y class="scroll-cont" :scroll-top="cateScrollTop" scroll-with-animation>
+                    <view class="item" :id="`cate${cateIndex}`" :class="{active: cateIndex == currCateIndex}" v-for="(cate, cateIndex) in cateList" @click="onChangeCate(cateIndex)">
                         <view class="img app-flex-center">
-                            <app-img src="/static/booking/icon-hot.png" w="64" h="64"></app-img>
+                            <app-img :src="`/static/booking/${cateIndex == 0 ? 'icon-hot' : 'icon-meat'+cateIndex%4}.png`" w="64" h="64"></app-img>
                         </view>
-                        <view class="name">热销推荐</view>
+                        <view class="name">{{cate.name}}</view>
                     </view>
-                    
-                    <view class="item">
-                        <view class="img app-flex-center">
-                            <app-img src="/static/booking/icon-meat0.png" w="64" h="64"></app-img>
-                        </view>
-                        <view class="name">烤肉类</view>
-                    </view>
+                    <u-gap height="20rpx" />
+                    <u-gap v-if="cartLen > 0" height="130rpx" />
                 </scroll-view>
             </view>
             
             <view class="goods-list">
-                <scroll-view scroll-y class="scroll-cont" @scroll="onRightScroll">
+                <scroll-view scroll-y class="scroll-cont" @scroll="onRightScroll" :scroll-top="goodsScrollTop" scroll-with-animation>
                     <view class="goods-cate" v-for="(cate, cateIndex) in goodsList">
-                        <view class="cate-title">{{cate.name}}</view>
+                        <view class="cate-title" :id="`title${cateIndex}`">{{cate.name}}</view>
                         <view class="list">
                             <view class="item" v-for="(good, goodIndex) in cate.list">
                                 <app-img class="img" radius="8" @click="onDetail" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="176" h="176"></app-img>
@@ -121,18 +116,19 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import { getVideo } from '@/api/photo'
 
-
 let isInitial = ref(false)
+let currCateIndex = ref(0)
+let cateScrollTop = ref(0)
+let goodsScrollTop = ref(0)
 let referInfo = reactive({
+    gap: 14,
     bottom: 0,
     height: 0,
 })
 let isShowRefer = ref(true)
-
-let list = ref([])
 let goodsList = ref([
     { name: '热销推荐', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '吊龙肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
@@ -141,7 +137,14 @@ let goodsList = ref([
     { name: '牛腩肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '雪花肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
     { name: '烤全牛', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '牛外脊', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '三岔肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '牛排', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
+    { name: '牛精肉', list: [{num: 0, price: 10}, {num: 0, price: 20}, {num: 0, price: 30}] },
 ])
+let cateList = computed(() => {
+    return goodsList.value.map(item => ({ name: item.name }))
+})
 let cartLen = computed(() => {
     return goodsList.value.reduce((tol1, cur1) => {
         let val = cur1.list.reduce((tol2, cur2) => {
@@ -149,6 +152,12 @@ let cartLen = computed(() => {
         }, 0)
         return tol1 + val;
     }, 0)
+})
+watch(currCateIndex, index => {
+    let calTop = cateList.value[index].calTop
+    if (calTop > 250) {
+        cateScrollTop.value = calTop - 250
+    }
 })
 // let popup = reactive({
 //     show: false,
@@ -167,7 +176,38 @@ function initPage() {
     
     setTimeout(() => {
         isInitial.value = true
+        calTitleLoc()
+        calCateLoc()
     }, 1000)
+}
+
+function calTitleLoc() {
+    goodsList.value.forEach((item, index) => {
+        let view = uni.createSelectorQuery().select(`#title${index}`)
+        view.fields({
+            size: true,
+            rect: true,
+        }, data => {
+            // console.log(`top: ${data.top-referInfo.bottom-referInfo.gap} ||| bottom: ${data.bottom} ||| left: ${data.left} ||| height: ${data.height}`);
+            item.calTop = index == 0 ? 0 : data.top-referInfo.bottom-referInfo.gap+6
+            // if (data && data.height >= 0) {
+            //     item.top = h
+            //     h += data.height
+            //     item.bottom = h
+            // }
+        }).exec()
+    })
+}
+
+function calCateLoc() {
+    cateList.value.forEach((item, index) => {
+        let view = uni.createSelectorQuery().select(`#cate${index}`)
+        view.fields({
+            rect: true,
+        }, data => {
+            item.calTop = index == 0 ? 0 : data.top-referInfo.bottom-referInfo.gap-10
+        }).exec()
+    })
 }
 
 function onRightScroll(e) {
@@ -177,6 +217,15 @@ function onRightScroll(e) {
     } else if (scrollTop <= 10 && !isShowRefer.value) {
         isShowRefer.value = true
     }
+    
+    let index = goodsList.value.findIndex(item => item.calTop > scrollTop)
+    currCateIndex.value = index == 0 ? 0 : index - 1
+}
+
+function onChangeCate(index) {
+    currCateIndex.value = index
+    
+    goodsScrollTop.value = goodsList.value[index].calTop
 }
 
 // uni.getSystemInfo({
@@ -211,7 +260,6 @@ function goPay() {
 function updateCarNum(e) {
     let indexArr = e.name.split('-')
     
-    console.log(456, e.value);
     let val = e.value ?? 1
     
     goodsList.value[indexArr[0]].list[indexArr[1]].num = val
@@ -301,9 +349,15 @@ function updateCarNum(e) {
             bottom: 0;
             min-width: 160rpx;
             background: #F6F6F6;
-            padding-top: 20rpx;
+            padding-top: 10px;
             .item {
                 padding: 20rpx 0;
+                &.active {
+                    .name {
+                        color: #E6212B;
+                        font-weight: bold;
+                    }
+                }
                 .name {
                     font-size: 28rpx;
                     text-align: center;
