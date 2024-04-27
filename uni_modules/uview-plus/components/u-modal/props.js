@@ -80,6 +80,12 @@ export default {
         confirmButtonShape: {
             type: String,
             default: defprops.modal.confirmButtonShape
-        }
+        },
+        
+        // 是否显示遮罩
+        overlay: {
+            type: Boolean,
+            default: true
+        },
     }
 }

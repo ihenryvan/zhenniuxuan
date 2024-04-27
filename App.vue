@@ -35,8 +35,8 @@
     
     function getShopInfo() {
         getShopList({latitude: 22, longitude: 114}).then(data => {
-            let info = data[1] || {}
-            if (info.id) {
+            let info = data.find(item => item.id == 10000)
+            if (info && info.id) {
                 let appStore = userAppStore()
                 appStore.storeShopInfo(info)
             } else {

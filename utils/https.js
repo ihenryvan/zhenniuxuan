@@ -18,18 +18,19 @@ function request(url, data, method, headers) {
 	return new Promise((resolve, reject) => {
 		let userInfo = uni.getStorageSync('userInfo');
         let params = data || {}
+        let httpHeaders = headers || http.headers
         
 		if (params.token) {
-			http.headers.Authorization = `${params.token}`
+			httpHeaders.Authorization = `${params.token}`
 		} else if (userInfo?.token) {
-            http.headers.Authorization = `${userInfo.token}`
+            httpHeaders.Authorization = `${userInfo.token}`
         }
 
 		uni.request({
 			url: url.startsWith('http') ? url : (http.baseUrl + url),
 			method: method || "GET",
 			data: params,
-			header: headers || http.headers,
+			header: httpHeaders,
 			sslVerify: false,
 			success: (res) => {
 				//

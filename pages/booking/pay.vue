@@ -60,7 +60,7 @@
                 </view>
                 <view class="redu">已优惠 ￥0</view>
             </view>
-            <view class="btn app-flex-center">立即支付</view>
+            <view class="btn app-flex-center" @click="surePay">立即支付</view>
         </view>
     </view>
     
@@ -73,30 +73,24 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
+import { saveOrder } from '@/api/order'
+import { userAppStore } from '@/store/app'
 
+let appStore = userAppStore()
+let shopInfo = appStore.shopInfo
 let popup = reactive({
     show: false,
 })
-
 let list = ref([])
 let goodsList = ref([
     { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
     { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
 ])
 
-// getVideo().then(data => {
-//     if (data?.length) {
-//         list.value = data
-//     }
-// })
+saveOrder({storeId: shopInfo.id, orderRemark: shopInfo.id})
 
-
-function updateCarNum(e) {
-    let indexArr = e.name.split('-')
-    let val = e.value
+function surePay() {
     
-    // goodsList.value[indexArr[0]].list[indexArr[1]].num = val
 }
 
 function onPreview(no) {

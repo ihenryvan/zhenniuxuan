@@ -50,18 +50,18 @@
                 <view class="label app-flex-item">我的会员</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/address?type=about')">
+            <!-- <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/address?type=about')">
                 <view class="label app-flex-item">地址管理</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
-            </view>
+            </view> -->
             <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/setup?type=about')">
                 <view class="label app-flex-item">设置</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/invoice')">
+            <!-- <view class="opt-item app-flex-center" @click="$navTo('/pages/mine/invoice')">
                 <view class="label app-flex-item">我的发票</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
-            </view>
+            </view> -->
         </view>
     </view>
     

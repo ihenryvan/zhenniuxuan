@@ -54,23 +54,23 @@
                         <view class="cate-title" :id="`title${cateIndex}`">{{cate.categoryName}}</view>
                         <view class="no-goods" v-if="!cate.gList || cate.gList.length === 0">该分类下暂无商品</view>
                         <view class="list" v-else>
-                            <view class="item" v-for="(good, goodIndex) in cate.gList">
-                                <app-img class="img" radius="8" @click="onDetail" :src="good.image" w="176" h="176"></app-img>
+                            <view class="good-item" v-for="(good, goodIndex) in cate.gList">
+                                <app-img class="img" radius="8" @click="onDetail(good)" :src="good.image" w="176" h="176"></app-img>
                                 <view class="intro">
-                                    <view class="name" @click="onDetail">{{good.title}}</view>
-                                    <view class="m-price app-flex" @click="onDetail">
+                                    <view class="name" @click="onDetail(good)">{{good.title}}</view>
+                                    <view class="m-price app-flex" @click="onDetail(good)">
                                         <view class="left">臻会员价</view>
-                                        <view class="right">￥{{good.vipDiscount}}</view>
+                                        <view class="right">￥{{good.discountPrice ?? '--'}}</view>
                                     </view>
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
                                             <text>￥</text>
-                                            <view class="val">{{good.originPrice}}</view>
+                                            <view class="val">{{good.sellPrice}}</view>
                                         </view>
                                         
-                                        <u-number-box :min="0" :value="good.num" :name="`${cateIndex}-${goodIndex}`" @change="updateCarNum">
+                                        <u-number-box :min="0" :value="good.num">
                                             <template #minus v-if="good.num > 0">
-                                                <view class="minus">
+                                                <view class="minus" @click="updateCarNum(1, cateIndex, goodIndex, good)">
                                                     <u-icon name="minus-circle" color="#999" size="24"></u-icon>
                                                 </view>
                                             </template>
@@ -78,7 +78,7 @@
                                                 <text class="amount">{{good.num || ''}}</text>
                                             </template>
                                             <template #plus>
-                                                <view class="plus">
+                                                <view class="plus" @click="updateCarNum(0, cateIndex, goodIndex, good)">
                                                     <u-icon name="plus-circle-fill" color="#E6212B" size="24"></u-icon>
                                                 </view>
                                             </template>
@@ -96,7 +96,7 @@
         
         <u-transition :show="cartLen > 0" mode="fade">
             <view class="cart-warp app-flex align-center">
-                <view class="cart">
+                <view class="cart" @click="cartPopup.isShow = !cartPopup.isShow">
                     <view class="num">
                         <u-badge :value="cartLen" bgColor="#E6212B"></u-badge>
                     </view>
@@ -106,25 +106,79 @@
                     <text>￥</text>
                     <view class="val">18.9</view>
                 </view>
-                <!-- <view class="btn app-flex-center" @click="goPay">立即下单</view> -->
-                <view class="btn app-flex-center" @click="detailRef.open">立即下单</view>
+                <view class="btn app-flex-center" @click="goPay">立即下单</view>
             </view>
         </u-transition>
+        
+        <u-popup :show="cartPopup.isShow" @close="closeCartPopup" zIndex="110" :safeAreaInsetBottom="false" overlayStyle="z-index: 100">
+            <view class="cart-popup">
+                <view class="title app-flex align-center space-between">
+                    <view class="left">
+                        <view class="main">{{shopInfo.storeName}}</view>
+                        <view class="sub">已选{{cartLen}}件</view>
+                    </view>
+                    <view class="right app-flex-center" @click="clearTip.isShow = true">
+                        <u-icon name="trash" size="18" color="#ccc" />
+                        <text>清空购物车</text>
+                    </view>
+                </view>
+                <view class="list">
+                    <view class="good-item" v-for="(good, goodIndex) in cartList">
+                        <app-img class="img" radius="8" :src="good.image" w="176" h="176"></app-img>
+                        <view class="intro">
+                            <view class="name">{{good.title}}</view>
+                            <view class="m-price app-flex">
+                                <view class="left">臻会员价</view>
+                                <view class="right">￥{{good.discountPrice ?? '--'}}</view>
+                            </view>
+                            <view class="bottom app-flex align-center space-between">
+                                <view class="price app-flex">
+                                    <text>￥</text>
+                                    <view class="val">{{good.sellPrice}}</view>
+                                </view>
+                                
+                                <u-number-box :min="0" :value="good.num">
+                                    <template #minus v-if="good.num > 0">
+                                        <view class="minus" @click="updateCarData(1, good)">
+                                            <u-icon name="minus-circle" color="#999" size="24"></u-icon>
+                                        </view>
+                                    </template>
+                                    <template #input v-show="good.num > 0">
+                                        <text class="amount">{{good.num || ''}}</text>
+                                    </template>
+                                    <template #plus>
+                                        <view class="plus" @click="updateCarData(0, good)">
+                                            <u-icon name="plus-circle-fill" color="#E6212B" size="24"></u-icon>
+                                        </view>
+                                    </template>
+                                </u-number-box>
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </u-popup>
     </view>
     
-    <app-goods-detail ref="detailRef" />
-    <!-- <u-popup :show="popup.show">
-        <view class="detail-popup">
-            <view class="close" @click="closeDetailPopup"></view>
-            <app-img src="/static/booking/test.png" w="750" h="1400"></app-img>
-        </view>
-    </u-popup> -->
+    <app-goods-detail ref="detailRef" @closed="onDetailPopupClosed" />
+    
+    <u-modal
+        asyncClose
+        showCancelButton
+        confirmColor="#E6212B"
+        :show="clearTip.isShow"
+        title="提示"
+        :overlay="false"
+        :content='clearTip.cont'
+        @confirm="sureClear"
+        @cancel="clearTip.isShow = false"
+    />
 </template>
 
 <script setup>
 import { reactive, ref, computed, watch, nextTick } from 'vue'
 import { userAppStore } from '@/store/app'
-import { getShopCate, getGoods } from '@/api/home'
+import * as api from '@/api/booking'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
@@ -144,12 +198,20 @@ let isNotRunScroll = false
 // let cateList = computed(() => {
 //     return goodsList.value.map(item => ({ name: item.name }))
 // })
+let cartList = computed(() => {
+    let list = []
+    goodsList.value.forEach(cate => {
+        cate.gList.forEach(good => {
+            if (good.num > 0) {
+                list.push({...good})
+            }
+        })
+    })
+    return list
+})
 let cartLen = computed(() => {
-    return goodsList.value.reduce((tol1, cur1) => {
-        let val = cur1.gList.reduce((tol2, cur2) => {
-            return tol2 + cur2.num
-        }, 0)
-        return tol1 + val;
+    return cartList.value.reduce((t, g) => {
+        return t + g.num
     }, 0)
 })
 let detailRef = ref(null)
@@ -162,9 +224,14 @@ watch(currCateIndex, index => {
         cateScrollTop.value = 0
     }
 })
-// let popup = reactive({
-//     show: false,
-// })
+let cartPopup = reactive({
+    isShow: false,
+    list: []
+})
+let clearTip = reactive({
+    isShow: false,
+    cont: '确认清空购物车吗？'
+})
 
 initPage()
 
@@ -181,14 +248,14 @@ function initPage() {
 }
 
 function getListData(storeId) { // 原来叫getCateList
-    getShopCate({storeId}).then(list => {
+    api.getShopCate({storeId}).then(list => {
         if (list.length === 0) return
         
         cateList.value = JSON.parse(JSON.stringify(list))
         
         let pArr = []
         list.forEach(item => {
-            pArr.push(getGoods({ storeId, cateId: item.id }).then(gList => {
+            pArr.push(api.getGoods({ storeId, cateId: item.id }).then(gList => {
                 gList.forEach(g => {
                     g.num = 0
                 })
@@ -196,7 +263,7 @@ function getListData(storeId) { // 原来叫getCateList
             }))
         })
         
-        Promise.all(pArr).then(() => {
+        Promise.all(pArr).then(async () => {
             isInitial.value = true
             goodsList.value = list
             
@@ -206,6 +273,26 @@ function getListData(storeId) { // 原来叫getCateList
                     calCateLoc()
                 }, 500)
             })
+            
+            let cartList = await initCartList()
+            goodsList.value.forEach((cate, cateIndex) => {
+                cate.gList.forEach((good, goodIndex) => {
+                    let cartGood = cartList.find(cg => cg.spId == good.productId)
+                    let indexData = `${cateIndex}-${goodIndex}`
+                    good.indexData = indexData
+                    if (cartGood) {
+                        good.num = cartGood.spNum
+                    }
+                })
+            })
+        })
+    })
+}
+
+function initCartList() {
+    return new Promise((resolve, reject) => {
+        api.cartGoods({storeId: shopInfo.id}).then(data => {
+            resolve(data)
         })
     })
 }
@@ -217,7 +304,7 @@ function calTitleLoc() {
             size: true,
             rect: true,
         }, data => {
-            console.log(`top: ${data.top-referInfo.bottom-referInfo.gap} ||| bottom: ${data.bottom} ||| left: ${data.left} ||| height: ${data.height}`);
+            // console.log(`top: ${data.top-referInfo.bottom-referInfo.gap} ||| bottom: ${data.bottom} ||| left: ${data.left} ||| height: ${data.height}`);
             item.calTop = index == 0 ? 0 : data.top-referInfo.bottom-referInfo.gap+6
             // if (data && data.height >= 0) {
             //     item.top = h
@@ -278,6 +365,10 @@ function onCall() {
     })
 }
 
+function closeCartPopup() {
+    cartPopup.isShow = false
+}
+
 // uni.getSystemInfo({
 //     success(data) {
 //         console.log(456, data);
@@ -294,24 +385,44 @@ function onCall() {
 //     }
 // })
 
-function onDetail() {
-    popup.show = true
+function onDetail(info) {
     uni.hideTabBar()
+    detailRef.value.open({...info})
 }
-function closeDetailPopup() {
-    popup.show = false
+
+function onDetailPopupClosed() {
     uni.showTabBar()
 }
+
 function goPay() {
     uni.navigateTo({
-        url: './pay'
+        url: `./pay?storeId=${shopInfo.id}`
     })
 }
-function updateCarNum(e) {
-    let indexArr = e.name.split('-')
-    let val = e.value ?? 1
+function updateCarData(type, row) {
+    console.log(type, row);
+    let indexArr = row.indexData.split('-')
+    updateCarNum(type, indexArr[0], indexArr[1], row)
+}
+function updateCarNum(type, cateIndex, goodIndex, row) {
+    let isAdd = type !== 1
     
-    goodsList.value[indexArr[0]].gList[indexArr[1]].num = val
+    api[isAdd ? 'addCart' : 'deductCart']({spId: row.productId, storeId: shopInfo.id}).then(() => {
+        // row.num = isAdd ? ++row.num : --row.num
+        // api.cartNum({storeId: shopInfo.id}) 查看数量
+        goodsList.value[cateIndex].gList[goodIndex].num = isAdd ? ++row.num : --row.num
+    })
+}
+
+function sureClear() {
+    api.clearCart({storeId: shopInfo.id}).then(() => {
+        cartList.value.forEach(item => {
+            clearTip.isShow = false
+            cartPopup.isShow = false
+            let indexArr = item.indexData.split('-')
+            goodsList.value[indexArr[0]].gList[indexArr[1]].num = 0
+        })
+    })
 }
 </script>
 
@@ -334,6 +445,36 @@ function updateCarNum(e) {
         }
     }
     .page-wrap {
+        .cart-popup {
+            padding-bottom: 110rpx;
+            .title {
+                padding: 20rpx 30rpx;
+                .left {
+                    .main {
+                        font-size: 30rpx;
+                    }
+                    .sub {
+                        color: #bbb;
+                        font-size: 26rpx;
+                    }
+                }
+                .right {
+                    padding: 20rpx 10rpx;
+                    margin-right: -10rpx;
+                    text {
+                        color: #aaa;
+                        font-size: 28rpx;
+                        margin-left: 4rpx;
+                    }
+                }
+            }
+            .list {
+                padding: 30rpx 30rpx 10rpx;
+                border-top: solid 1px #eee;
+                max-height: 50vh;
+                overflow-y: scroll;
+            }
+        }
         .info-wrap {
             position: relative;
             padding: 24rpx 30rpx;
@@ -436,59 +577,60 @@ function updateCarNum(e) {
             .goods-cate:first-child .cate-title {
                 padding-top: 10rpx;
             }
-            .item {
-                position: relative;
-                min-height: 176rpx;
-                &:not(:last-child) {
-                    padding-bottom: 24rpx;
-                    margin-bottom: 24rpx;
-                    border-bottom: solid 1px #F7F8FA;
+        }
+        
+        .good-item {
+            position: relative;
+            min-height: 200rpx; // 176+24
+            &:not(:last-child) {
+                // padding-bottom: 24rpx;
+                margin-bottom: 24rpx;
+                border-bottom: solid 1px #F7F8FA;
+            }
+            
+            .img {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+            .intro {
+                padding-left: 196rpx;
+                .name {
+                    font-size: 30rpx;
+                    min-height: 40rpx;
+                    padding-top: 4rpx;
                 }
-                
-                .img {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                }
-                .intro {
-                    padding-left: 196rpx;
-                    .name {
-                        font-size: 30rpx;
-                        min-height: 40rpx;
-                        padding-top: 4rpx;
+                .m-price {
+                    overflow: hidden;
+                    border-radius: 8rpx;
+                    margin-top: 10rpx;
+                    .left {
+                        color: #EBFF00;
+                        background: #000000;
+                        font-size: 24rpx;
+                        padding: 4rpx 10rpx;
                     }
-                    .m-price {
-                        overflow: hidden;
-                        border-radius: 8rpx;
-                        margin-top: 10rpx;
-                        .left {
-                            color: #EBFF00;
-                            background: #000000;
+                    .right {
+                        color: #E6212B;
+                        background: #F7F8FA;
+                        font-size: 28rpx;
+                        padding: 2rpx 10rpx 0 6rpx
+                    }
+                }
+                .bottom {
+                    margin-top: 10rpx;
+                    .price {
+                        align-items: baseline;
+                        text {
                             font-size: 24rpx;
-                            padding: 4rpx 10rpx;
                         }
-                        .right {
-                            color: #E6212B;
-                            background: #F7F8FA;
-                            font-size: 28rpx;
-                            padding: 2rpx 10rpx 0 6rpx
+                        .val {
+                            font-size: 32rpx;
                         }
                     }
-                    .bottom {
-                        margin-top: 10rpx;
-                        .price {
-                            align-items: baseline;
-                            text {
-                                font-size: 24rpx;
-                            }
-                            .val {
-                                font-size: 32rpx;
-                            }
-                        }
-                        .amount {
-                            min-width: 60rpx;
-                            text-align: center;
-                        }
+                    .amount {
+                        min-width: 60rpx;
+                        text-align: center;
                     }
                 }
             }
@@ -499,7 +641,7 @@ function updateCarNum(e) {
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 10;
+            z-index: 120;
             height: 110rpx;
             background: #F6F6F6;
             .cart {

@@ -8,7 +8,7 @@
         </u-sticky>
         
         <view class="order-list">
-            <view class="item" v-for="item in 5" @click="onPreview(item.videoNo)">
+            <view class="item" v-for="item in list" @click="onPreview(item.videoNo)">
                 <view class="top app-flex-center">
                     <view class="app-flex-item app-flex align-center">
                         <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img>
@@ -46,37 +46,64 @@
                     </view>
                 </view>
             </view>
+            
+            <view style="padding-bottom: 10rpx;">
+                <u-loadmore :status="loading" />
+            </view>
         </view>
         
     </view>
     
-    <u-popup :show="popup.show" mode="center">
-        <view>
-            <text>出</text>
-        </view>
-    </u-popup>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
-
-let popup = reactive({
-    show: false,
-})
+import { orderList } from '@/api/order'
+import { onShow, onReachBottom } from '@dcloudio/uni-app'
 
 let list = ref([])
+let total = ref(0)
+let loading = ref('loading')
 let tabList = ref([
     {name: '全部'},
     {name: '门店订单'},
     {name: '售后'},
 ])
+let params = {
+    pageNum: 1,
+    pageSize: 8,
+}
 
-// getVideo().then(data => {
-//     if (data?.length) {
-//         list.value = data
-//     }
-// })
+onShow(() => {
+    getList()
+})
+
+onReachBottom((aa) => {
+    getList()
+})
+
+function getList(isReset = false) {
+    
+    if (isReset) {
+        params.pageNum = 1
+    }
+    
+    loading.value = 'loading'
+    orderList(params).then(data => {
+        console.log(123, data);
+        
+        if (data.total == 0) return
+        
+        total.value = data.total
+        
+        list.value = isReset ? JSON.parse(JSON.stringify(data.rows)) : list.value.concat(data.rows)
+        
+        if (list.value) {}
+    }).finally(() => {
+        // loading.value = false
+    })
+}
+
 
 function onPreview(no) {
     // popup.show = true

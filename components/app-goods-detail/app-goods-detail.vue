@@ -1,39 +1,44 @@
 <template>
     <u-popup :show="isShow" @close="close">
         <view class="good-detail">
-            <view class="func-wrap">
-                
+            <view class="func-wrap app-flex-center">
+                <view class="func-icon">
+                    <!-- <app-img src="/static/common/icon-share.png" w="52" h="52"></app-img> -->
+                </view>
+                <view class="func-icon" @click="close">
+                    <app-img src="/static/common/icon-close.png" w="52" h="52"></app-img>
+                </view>
             </view>
             
-            <app-img src="aaaa" w="750" h="480"></app-img>
+            <app-img :src="info.image" w="750" h="480"></app-img>
             <view class="good-cont">
-                <view class="title">2024款 原切澳洲谷饲眼肉盖</view>
+                <view class="title">{{info.title}}</view>
                 <view class="info">
                     <view class="row app-flex">
                         <view class="label">库存：</view>
-                        <view class="value">77</view>
+                        <view class="value">{{info.stock}}</view>
                     </view>
                 </view>
                 <view class="specs">
                     <view class="label">规格</view>
                     <view class="value app-flex">
-                        <view class="val">120g</view>
+                        <view class="val">{{info.weight}}{{info.unit}}</view>
                     </view>
                 </view>
                 
                 <u-divider text="" lineColor="#eee"></u-divider>
-                <view class="intro">规格规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒规格打发的撒打发的撒</view>
+                <view class="intro">{{info.details ?? '--'}}</view>
                 <u-divider text="" lineColor="#eee"></u-divider>
                 
                 <view class="price-wrap app-flex-center">
                     <view class="left app-flex-center">
                         <view class="price app-flex">
                             <text>￥</text>
-                            <view class="val">{{info.originPrice}}100</view>
+                            <view class="val">{{info.sellPrice}}</view>
                         </view>
                         <view class="m-price app-flex">
                             <view class="left">臻会员价</view>
-                            <view class="right">￥{{info.vipDiscount}}66</view>
+                            <view class="right">￥{{info.discountPrice ?? '--'}}</view>
                         </view>
                     </view>
                     <view class="app-flex-item"></view>
@@ -62,9 +67,113 @@
     </u-popup>
 </template>
 
+<script setup>
+    import { ref, reactive } from 'vue'
+    import * as auth from '@/api/auth'
+    import config from '@/config'
+    import { userAppStore } from '@/store/app'
+
+    let appStore = userAppStore()
+    let emit = defineEmits(['closed'])
+    let isShow = ref(false)
+    let info = ref({})
+    let params = {}
+    let props = defineProps({
+        id: {
+            required: true,
+            type: [Number, String]
+        }
+    })
+    
+    
+    function open(objData) {
+        let data = Object.assign({}, objData, {num: 1})
+        info.value = data
+        isShow.value = true
+    }
+
+    function close() {
+        isShow.value = false
+        emit('closed')
+    }
+    
+    function changeNum(data) {
+        info.value.num = data.value
+    }
+
+    function getPhoneNumber(evt) {
+        let {
+            iv,
+            encryptedData,
+            errMsg
+        } = evt.detail
+        
+        if (errMsg.indexOf('ok') < 0) {
+            return uni.showToast({
+                icon: 'none',
+                title: '手机号获取失败'
+            })
+        }
+
+        let queryData = {
+            iv,
+            encryptedData,
+            openid: params.openid,
+            sessionKey: params.sessionKey,
+            // avatarUrl: userInfo.avatar,
+            // nickName: userInfo.nickname,
+        }
+        
+        uni.showLoading({
+            title: '授权中'
+        })
+        auth.getPhone(queryData).then(async data => {
+            data.openId = params.openid
+            let info = await setUserInfo(data)
+            
+            data.nickname = userInfo.nickname
+            data.avatar = userInfo.avatar
+            
+            appStore.storeUserInfo(data)
+            close()
+        }).finally(() => {
+            uni.hideLoading()
+        })
+    }
+    
+    function setUserInfo(info) {
+        return new Promise((resolve, reject) => {
+            let params = {
+                token: info.token,
+                nickname: userInfo.nickname,
+                avatar: userInfo.avatar
+            }
+            auth.updateUserInfo(params).then(data => {
+                resolve(data)
+            }).catch(err => {
+                reject(err)
+            })
+        })
+    }
+
+    defineExpose({
+        open
+    })
+</script>
+
 <style lang="scss" scoped>
     .good-detail {
         position: relative;
+        .func-wrap {
+            position: absolute;
+            top: 4rpx;
+            right: 8rpx;
+            z-index: 1;
+            .func-icon {
+                padding: 10rpx;
+                margin: 10rpx;
+            }
+        }
         .good-cont {
             padding: 0 30rpx 20rpx;
             .title {
@@ -143,93 +252,3 @@
         }
     }
 </style>
-
-<script setup>
-    import { ref, reactive } from 'vue'
-    import * as auth from '@/api/auth'
-    import config from '@/config'
-    import { userAppStore } from '@/store/app'
-
-    let appStore = userAppStore()
-    let emit = defineEmits(['authed'])
-    let isShow = ref(false)
-    let info = ref({
-        num: 1
-    })
-    let params = {}
-    
-    
-    function open() {
-        isShow.value = true
-    }
-
-    function close() {
-        isShow.value = false
-    }
-    
-    
-
-    function changeNum() {
-    }
-
-    function getPhoneNumber(evt) {
-        let {
-            iv,
-            encryptedData,
-            errMsg
-        } = evt.detail
-        
-        if (errMsg.indexOf('ok') < 0) {
-            return uni.showToast({
-                icon: 'none',
-                title: '手机号获取失败'
-            })
-        }
-
-        let queryData = {
-            iv,
-            encryptedData,
-            openid: params.openid,
-            sessionKey: params.sessionKey,
-            // avatarUrl: userInfo.avatar,
-            // nickName: userInfo.nickname,
-        }
-        
-        uni.showLoading({
-            title: '授权中'
-        })
-        auth.getPhone(queryData).then(async data => {
-            data.openId = params.openid
-            let info = await setUserInfo(data)
-            
-            data.nickname = userInfo.nickname
-            data.avatar = userInfo.avatar
-            
-            appStore.storeUserInfo(data)
-            emit('authed', data)
-            close()
-        }).finally(() => {
-            uni.hideLoading()
-        })
-    }
-    
-    function setUserInfo(info) {
-        return new Promise((resolve, reject) => {
-            let params = {
-                token: info.token,
-                nickname: userInfo.nickname,
-                avatar: userInfo.avatar
-            }
-            auth.updateUserInfo(params).then(data => {
-                resolve(data)
-            }).catch(err => {
-                reject(err)
-            })
-        })
-    }
-
-    defineExpose({
-        open
-    })
-</script>
-

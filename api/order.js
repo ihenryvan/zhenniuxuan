@@ -2,20 +2,30 @@
 
 import request from "../utils/https.js"
 
-// 开始充电（下单）
-export const createOrder = (data)=>{
-	return request.post('/api/order/createCdOrder',data)
+// 下单
+export const saveOrder = (data)=>{
+	return request.post('/api/order/balance', data, { 'content-type': 'application/json' })
 }
 
-// 获取订单列表
-export const getOrderList = (data)=>{
-	return request.post('/api/order/queryCdOrderList',data)
+// 订单列表
+export const orderList = (data)=>{
+	return request.get('/api/order/list', data, { 'content-type': 'application/json' })
 }
 
 // 订单详情
-export const queryOrderInfo = (data)=>{
-	return request.post('/api/order/queryCdOrderDetail',data)
+export const orderDetail = (data)=>{
+	return request.get('/api/order/details', data, { 'content-type': 'application/json' })
 }
+
+
+
+
+
+
+
+
+
+
 
 // 微信支付参数
 export const weixinMiniParam = (data)=>{
@@ -31,11 +41,6 @@ export const invoiceList = (data)=>{
 export const invoiceDetail = (data)=>{
 	return request.post('/api/invoice/detail', data)
 }
-
-export const overOrder = (data)=>{
-	return request.post('/api/order/overOrder',data)
-}
-
 
 export const invoiceAdd = (data)=>{
 	return request.post('/api/invoice/add',data)

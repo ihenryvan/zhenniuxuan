@@ -8,18 +8,8 @@ export const getShopList = data => {
 }
 
 // 店铺详情
-export const getSiteDetail = data => {
-    return request.get('/api/store/detail', data)
-}
-
-// 店铺-商品分类
-export const getShopCate = data => {
-    return request.get('/api/product/categories', data)
-}
-
-// 店铺-商品分类-商品
-export const getGoods = data => {
-    return request.get('/api/product/list', data)
+export const getShopDetail = data => {
+    return request.get('/api/store/details', data)
 }
 
 export const geocode = data => {
