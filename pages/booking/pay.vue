@@ -4,13 +4,13 @@
         <view class="info-wrap">
             <view class="shop-info app-flex align-center">
                 <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
-                <view class="name">牛气无语（龙华清湖店）</view>
+                <view class="name">{{shopInfo.storeName}}</view>
                 <!-- <u-icon class="icon" name="arrow-right" size="16" color="#333" /> -->
             </view>
-            <view class="doc-info app-flex align-center">
+            <!-- <view class="doc-info app-flex align-center">
                 <u-icon name="map" size="18" color="#666" />
                 <text>距离您14.10km</text>
-            </view>
+            </view> -->
             <view class="time-info app-flex space-between">
                 <view class="label">自提时间</view>
                 <view class="value">约14:39可取</view>
@@ -63,34 +63,61 @@
             <view class="btn app-flex-center" @click="surePay">立即支付</view>
         </view>
     </view>
-    
-    <u-popup :show="popup.show" mode="center">
-        <view>
-            <text>出</text>
-        </view>
-    </u-popup>
 </template>
 
 <script setup>
 import { reactive, ref } from 'vue'
 import { saveOrder } from '@/api/order'
+import { cartGoods } from '@/api/booking'
 import { userAppStore } from '@/store/app'
+import { onLoad } from '@dcloudio/uni-app'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
-let popup = reactive({
-    show: false,
-})
 let list = ref([])
-let goodsList = ref([
-    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
-    { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
-])
 
-saveOrder({storeId: shopInfo.id, orderRemark: shopInfo.id})
+onLoad(option => {
+    if (option.id) { // 从订单列表页进入
+        
+    } else { // 从下单页进入
+        getCartGoods()
+    }
+})
+
+function getCartGoods() {
+    cartGoods({storeId: shopInfo.id}).then(data => {
+    })
+}
 
 function surePay() {
-    
+    uni.showLoading({
+        title: '正在拉起支付'
+    })
+    saveOrder({storeId: shopInfo.id}).then(data => {
+        uni.requestPayment({
+            provider: 'wxpay',
+            timeStamp: data.signMap.timeStamp,
+            nonceStr: data.signMap.nonceStr,
+            package: data.signMap.package,
+            signType: data.signMap.signType,
+            paySign: data.signMap.paySign,
+            success: function(res) {
+                goOrderPage()
+            },
+            fail: function(err) {
+                goOrderPage()
+                console.log('err:' + JSON.stringify(err))
+            }
+        })
+    }).finally(() => {
+        uni.hideLoading()
+    })
+}
+
+function goOrderPage() {
+    uni.switchTab({
+        url: '/pages/order/order'
+    })
 }
 
 function onPreview(no) {

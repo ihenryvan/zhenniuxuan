@@ -7,28 +7,35 @@
             </view>
         </u-sticky>
         
-        <view class="order-list">
-            <view class="item" v-for="item in list" @click="onPreview(item.videoNo)">
+        <view class="no-data" v-if="loading == 'nomore' && total == 0">
+            <app-img src="/static/order/no-order.png" w="392" h="318" margin="0 auto"></app-img>
+            <view class="txt">暂无订单</view>
+            <view class="btn app-flex-center" @click="goBooking">去下单</view>
+        </view>
+        <view class="order-list" v-else>
+            <view class="item" v-for="item in list" @click="onPreview(item.id)">
                 <view class="top app-flex-center">
                     <view class="app-flex-item app-flex align-center">
                         <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img>
-                        <view class="name">牛气无语（龙华清湖店）</view>
+                        <view class="name">{{shopInfo.storeName}}</view>
                     </view>
-                    <view class="status">待提货</view>
+                    <view class="status" v-if="item.orderStatus == 'nopay'">待支付</view>
+                    <view class="status" v-if="item.orderStatus == 'paid'">待核销</view>
+                    <view class="status" v-if="item.orderStatus == 'finish'">已完成</view>
                 </view>
                 <view class="center app-flex space-between">
                     <view class="goods-list app-flex">
-                        <view class="goods-item" v-for="item in 3">
-                            <app-img class="img" radius="8" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="124" h="124"></app-img>
-                            <view class="goods-name">牛排</view>
+                        <view class="goods-item" v-for="good in item.productList">
+                            <app-img class="img" radius="8" :src="good.productImage" w="124" h="124"></app-img>
+                            <view class="goods-name">{{good.productTitle}}</view>
                         </view>
                     </view>
                     <view>
-                        <view class="total">共计3件</view>
+                        <view class="total">共计{{item.totalNum}}件</view>
                         <view class="price-wrap">
                             <view class="price app-flex">
                                 <text>￥</text>
-                                <view class="val">18.96</view>
+                                <view class="val">{{item.dueAmount}}</view>
                             </view>
                         </view>
                     </view>
@@ -37,11 +44,11 @@
                     <view class="app-flex-item">
                         <view class="row app-flex align-center">
                             <view class="label">下单时间：</view>
-                            <view class="value">2024-04-16 16:01:01</view>
+                            <view class="value">{{item.createTime}}</view>
                         </view>
                         <view class="row app-flex align-center">
                             <view class="label">订单号：</view>
-                            <view class="value">9777165***123</view>
+                            <view class="value">{{item.orderNo}}</view>
                         </view>
                     </view>
                 </view>
@@ -59,8 +66,11 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { orderList } from '@/api/order'
+import { userAppStore } from '@/store/app'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
 
+let appStore = userAppStore()
+let shopInfo = appStore.shopInfo
 let list = ref([])
 let total = ref(0)
 let loading = ref('loading')
@@ -75,7 +85,8 @@ let params = {
 }
 
 onShow(() => {
-    getList()
+    console.log(123);
+    getList(true)
 })
 
 onReachBottom((aa) => {
@@ -86,29 +97,41 @@ function getList(isReset = false) {
     
     if (isReset) {
         params.pageNum = 1
+        loading.value = 'loading'
     }
     
-    loading.value = 'loading'
+    if (loading.value === 'nomore') return
     orderList(params).then(data => {
-        console.log(123, data);
-        
-        if (data.total == 0) return
+        // data.total = 0
+        if (data.total == 0) {
+            return loading.value = 'nomore'
+        }
         
         total.value = data.total
-        
+        data.rows.forEach(item => {
+            let totalNum = item.productList.reduce((t, c) => {
+                return t + c.productNum
+            }, 0)
+            item.totalNum = totalNum
+        })
         list.value = isReset ? JSON.parse(JSON.stringify(data.rows)) : list.value.concat(data.rows)
+        params.pageNum++
         
-        if (list.value) {}
-    }).finally(() => {
-        // loading.value = false
+        if (list.value.length >= total.value) {
+            loading.value = 'nomore'
+        }
     })
 }
 
+function goBooking() {
+    uni.switchTab({
+        url: '/pages/booking/booking'
+    })
+}
 
-function onPreview(no) {
-    // popup.show = true
+function onPreview(id) {
     uni.navigateTo({
-        url: `/pages/order/order-detail?no=${no}`
+        url: `/pages/order/order-detail?id=${id}`
     })
 }
 </script>
@@ -120,6 +143,23 @@ function onPreview(no) {
 </style>
 <style scoped lang="scss">
     .page-wrap {
+        .no-data {
+            padding-top: 300rpx;
+            .txt {
+                color: #939393;
+                font-size: 28rpx;
+                text-align: center;
+            }
+            .btn {
+                width: 292rpx;
+                height: 84rpx;
+                color: #fff;
+                font-size: 30rpx;
+                background: #E6212B;
+                border-radius: 16rpx;
+                margin: 40rpx auto 0;
+            }
+        }
         .order-list {
             .item {
                 background: #fff;

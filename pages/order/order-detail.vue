@@ -65,30 +65,17 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
+import { orderDetail } from '@/api/order'
+import { onLoad } from '@dcloudio/uni-app'
 
-let popup = reactive({
-    show: false,
+onLoad(option => {
+    getDetail(option.id)
 })
 
-let list = ref([])
-let goodsList = ref([
-    { name: '热销推荐', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
-    { name: '烤牛肉', list: [{num: 0}, {num: 0}, {num: 0}, {num: 0}] },
-])
-
-// getVideo().then(data => {
-//     if (data?.length) {
-//         list.value = data
-//     }
-// })
-
-
-function updateCarNum(e) {
-    let indexArr = e.name.split('-')
-    let val = e.value
-    
-    // goodsList.value[indexArr[0]].list[indexArr[1]].num = val
+function getDetail(id) {
+    orderDetail({ id }).then(data => {
+        console.log(666, data);
+    })
 }
 
 function onPreview(no) {

@@ -44,7 +44,7 @@
 			},
             margin: {
                 type: String,
-                default: '0, 0',
+                default: '0 0',
             },
 			isStaff: { // 企业员工
 				type: Boolean,

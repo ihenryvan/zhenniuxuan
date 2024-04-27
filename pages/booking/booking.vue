@@ -177,6 +177,7 @@
 
 <script setup>
 import { reactive, ref, computed, watch, nextTick } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { userAppStore } from '@/store/app'
 import * as api from '@/api/booking'
 
@@ -233,6 +234,12 @@ let clearTip = reactive({
     cont: '确认清空购物车吗？'
 })
 
+onShow(() => {
+    if (goodsList.value.length) {
+        updateCartData()
+    }
+})
+
 initPage()
 
 function initPage() {
@@ -263,7 +270,7 @@ function getListData(storeId) { // 原来叫getCateList
             }))
         })
         
-        Promise.all(pArr).then(async () => {
+        Promise.all(pArr).then(() => {
             isInitial.value = true
             goodsList.value = list
             
@@ -274,17 +281,19 @@ function getListData(storeId) { // 原来叫getCateList
                 }, 500)
             })
             
-            let cartList = await initCartList()
-            goodsList.value.forEach((cate, cateIndex) => {
-                cate.gList.forEach((good, goodIndex) => {
-                    let cartGood = cartList.find(cg => cg.spId == good.productId)
-                    let indexData = `${cateIndex}-${goodIndex}`
-                    good.indexData = indexData
-                    if (cartGood) {
-                        good.num = cartGood.spNum
-                    }
-                })
-            })
+            updateCartData()
+        })
+    })
+}
+
+async function updateCartData() {
+    let cartList = await initCartList()
+    goodsList.value.forEach((cate, cateIndex) => {
+        cate.gList.forEach((good, goodIndex) => {
+            let cartGood = cartList.find(cg => cg.spId == good.productId)
+            let indexData = `${cateIndex}-${goodIndex}`
+            good.indexData = indexData
+            good.num = cartGood ? cartGood.spNum : 0
         })
     })
 }
