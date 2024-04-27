@@ -6,7 +6,7 @@
     
     export default {
         onLaunch: function() {
-            // getShopInfo() // 临时
+            getShopInfo() // 临时
             reStoreInfo()
         },
         onShow: function() {
