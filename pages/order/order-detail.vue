@@ -9,7 +9,6 @@
                     </view>
                     <view class="status-txt" style="padding-top: 16rpx;">核销码</view>
                     
-                    <ayQrcode ref="qrcode" :modal="modal_qr" :url="url" @hideQrcode="hideQrcode" :height="300" :width="300" />
                 </template>
                 <template v-else>
                     <view class="app-flex-center">
