@@ -288,7 +288,9 @@ function getListData(storeId) { // 原来叫getCateList
                 }, 500)
             })
             
-            updateCartData()
+            if (appStore.hasLogin) {
+                updateCartData()
+            }
         })
     })
 }
@@ -402,6 +404,13 @@ function closeCartPopup() {
 // })
 
 function onDetail(info) {
+    if (!appStore.hasLogin) {
+        return uni.showToast({
+            title: '请先登陆',
+            icon: 'none'
+        })
+    }
+    
     uni.hideTabBar()
     detailRef.value.open({...info})
 }
@@ -421,6 +430,13 @@ function updateCarData(type, row) {
     updateCarNum(type, indexArr[0], indexArr[1], row)
 }
 function updateCarNum(type, cateIndex, goodIndex, row) {
+    if (!appStore.hasLogin) {
+        return uni.showToast({
+            title: '请先登陆',
+            icon: 'none'
+        })
+    }
+    
     let isAdd = type !== 1
     
     api[isAdd ? 'addCart' : 'deductCart']({spId: row.productId, storeId: shopInfo.id}).then(() => {

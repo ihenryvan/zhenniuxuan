@@ -8,7 +8,7 @@
                     <app-img v-if="appStore.hasLogin" type="avatar" :src="appStore.userInfo.avatar" w="144" h="144"></app-img>
                     <app-img v-else src="/static/mine/avatar.png" w="144" h="144"></app-img>
                 </view>
-                <view class="nickname app-flex-center" v-if="!appStore.hasLogin">点击登录</view>
+                <view class="nickname app-flex-center" v-if="!appStore.hasLogin" style="color: #E6212B; font-weight: bold;">点击登录</view>
             </view>
         </view>
         

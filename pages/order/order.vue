@@ -7,10 +7,14 @@
             </view>
         </u-sticky>
         
-        <view class="no-data" v-if="loading == 'nomore' && total == 0">
+        <view class="no-login" v-if="!appStore.hasLogin">
+            <view class="tip">您还没有登陆~</view>
+            <view class="theme-btn app-flex-center" @click="goLogin">去登陆</view>
+        </view>
+        <view class="no-data" v-else-if="loading == 'nomore' && total == 0">
             <app-img src="/static/order/no-order.png" w="392" h="318" margin="0 auto"></app-img>
             <view class="txt">暂无订单</view>
-            <view class="btn app-flex-center" @click="goBooking">去下单</view>
+            <view class="theme-btn app-flex-center" @click="goBooking">去下单</view>
         </view>
         <view class="order-list" v-else>
             <view class="item" v-for="item in list" @click="onPreview(item)">
@@ -84,8 +88,9 @@ let params = {
 }
 
 onShow(() => {
-    console.log(123);
-    getList(true)
+    if (appStore.hasLogin) {
+        getList(true)
+    }
 })
 
 onReachBottom((aa) => {
@@ -137,7 +142,11 @@ function goBooking() {
         url: '/pages/booking/booking'
     })
 }
-
+function goLogin() {
+    uni.switchTab({
+        url: '/pages/mine/mine'
+    })
+}
 </script>
 
 <style lang="scss">
@@ -147,6 +156,14 @@ function goBooking() {
 </style>
 <style scoped lang="scss">
     .page-wrap {
+        .no-login {
+            .tip {
+                color: #999;
+                font-size: 30rpx;
+                text-align: center;
+            }
+            padding-top: 300rpx;
+        }
         .no-data {
             padding-top: 300rpx;
             .txt {
@@ -154,15 +171,15 @@ function goBooking() {
                 font-size: 28rpx;
                 text-align: center;
             }
-            .btn {
-                width: 292rpx;
-                height: 84rpx;
-                color: #fff;
-                font-size: 30rpx;
-                background: #E6212B;
-                border-radius: 16rpx;
-                margin: 40rpx auto 0;
-            }
+        }
+        .theme-btn {
+            width: 292rpx;
+            height: 84rpx;
+            color: #fff;
+            font-size: 30rpx;
+            background: #E6212B;
+            border-radius: 16rpx;
+            margin: 40rpx auto 0;
         }
         .order-list {
             .item {
