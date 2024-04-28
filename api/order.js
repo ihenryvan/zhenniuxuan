@@ -17,6 +17,10 @@ export const orderDetail = (data)=>{
 	return request.get('/api/order/details', data, { 'content-type': 'application/json' })
 }
 
+// 支付订单
+export const payOrder = (data)=>{
+	return request.post('/api/order/pay', data)
+}
 
 
 

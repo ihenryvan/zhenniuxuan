@@ -2,11 +2,12 @@
     <u-navbar bgColor="#fff" title="我的客服" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
         <view class="list">
-            <view class="item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="item app-flex-center" @click="goChat">
                 <view class="label app-flex-item">门店客服</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="item app-flex-center" @click="$navTo('/pages/user/protocol?type=about')">
+            <view class="item app-flex-center" style="position: relative;">
+                <button open-type="contact" style="position: absolute;width: 100%;height: 100%;left: 0;top: 0;opacity: 0;"></button>
                 <view class="label app-flex-item">平台客服</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
@@ -19,21 +20,10 @@
 import { reactive, ref } from 'vue'
 import { getVideo } from '@/api/photo'
 
-let popup = reactive({
-    show: false,
-})
-
-function updateCarNum(e) {
-    let indexArr = e.name.split('-')
-    let val = e.value
-    
-    // goodsList.value[indexArr[0]].list[indexArr[1]].num = val
-}
-
-function onPreview(no) {
-    // popup.show = true
-    uni.navigateTo({
-        url: `/pages/photo/detail?no=${no}`
+function goChat(e) {
+    uni.showToast({
+        title: '敬请期待',
+        icon: 'none'
     })
 }
 </script>

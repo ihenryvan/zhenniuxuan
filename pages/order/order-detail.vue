@@ -1,17 +1,24 @@
 <template>
-    <u-navbar bgColor="#fff" title="已完成" :auto-back="true" :placeholder="true" />
+    <u-navbar bgColor="#fff" :title="orderStatus[status]" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
         <view class="info-wrap">
             <view class="status-info">
-                <view class="app-flex-center">
-                    <app-img src="/static/order/icon-status.png" w="258" h="258"></app-img>
-                </view>
-                <view class="status-txt">感谢您的光临</view>
+                <template v-if="status == 'paid'">
+                    <view class="app-flex-center">
+                        <app-img src="/static/order/code.png" w="258" h="258"></app-img>
+                    </view>
+                    <view class="status-txt" style="padding-top: 16rpx;">核销码</view>
+                </template>
+                <template v-else>
+                    <view class="app-flex-center">
+                        <app-img src="/static/order/icon-status.png" w="258" h="258"></app-img>
+                    </view>
+                    <view class="status-txt">感谢您的光临</view>
+                </template>
             </view>
             <view class="shop-info app-flex align-center">
                 <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
-                <view class="name">牛气无语（龙华清湖店）</view>
-                <!-- <u-icon class="icon" name="arrow-right" size="16" color="#333" /> -->
+                <view class="name">{{shopInfo.storeName}}</view>
             </view>
             <view class="doc-info app-flex align-center">
                 <u-icon name="map" size="18" color="#666" />
@@ -26,21 +33,21 @@
                         <!-- <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img> -->
                         <view class="name">订单编号：9977712562123</view>
                     </view>
-                    <view class="status">待提货</view>
+                    <view class="status" :class="status">{{orderStatus[status]}}</view>
                 </view>
                 <view class="center app-flex space-between">
                     <view class="goods-list app-flex">
-                        <view class="goods-item" v-for="item in 3">
-                            <app-img class="img" radius="8" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="124" h="124"></app-img>
-                            <view class="goods-name">牛排</view>
+                        <view class="goods-item" v-for="item in info.productList">
+                            <app-img class="img" radius="8" :src="item.productImage" w="124" h="124"></app-img>
+                            <view class="goods-name">{{item.productTitle}}</view>
                         </view>
                     </view>
                     <view>
-                        <view class="total">共计3件</view>
+                        <view class="total">共计{{info.totalNum}}件</view>
                         <view class="price-wrap">
                             <view class="price app-flex">
                                 <text>￥</text>
-                                <view class="val">18.96</view>
+                                <view class="val">{{info.dueAmount}}</view>
                             </view>
                         </view>
                     </view>
@@ -48,12 +55,16 @@
                 <view class="bottom app-flex-center">
                     <view class="app-flex-item">
                         <view class="row app-flex align-center">
-                            <view class="label">下单时间：</view>
-                            <view class="value">2024-04-16 16:01:01</view>
+                            <view class="label">订单号：</view>
+                            <view class="value">{{info.orderNo}}</view>
                         </view>
                         <view class="row app-flex align-center">
-                            <view class="label">订单号：</view>
-                            <view class="value">9777165***123</view>
+                            <view class="label">下单时间：</view>
+                            <view class="value">{{info.createTime}}</view>
+                        </view>
+                        <view class="row app-flex align-center" v-if="status == 'paid'">
+                            <view class="label">支付时间：</view>
+                            <view class="value">{{info.payTime}}</view>
                         </view>
                     </view>
                 </view>
@@ -66,23 +77,30 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { orderDetail } from '@/api/order'
+import { userAppStore } from '@/store/app'
+import { orderStatus } from '@/common/js/status'
 import { onLoad } from '@dcloudio/uni-app'
 
 onLoad(option => {
+    status.value = option.status
     getDetail(option.id)
 })
 
+let appStore = userAppStore()
+let shopInfo = appStore.shopInfo
+let status = ref('')
+let info = ref({})
+
 function getDetail(id) {
     orderDetail({ id }).then(data => {
-        console.log(666, data);
+        data.totalNum = data.productList.reduce((t, c) => {
+            return t + c.productNum
+        }, 0)
+        info.value = data
     })
 }
 
 function onPreview(no) {
-    // popup.show = true
-    uni.navigateTo({
-        url: `/pages/photo/detail?no=${no}`
-    })
 }
 </script>
 
@@ -143,8 +161,17 @@ function onPreview(no) {
                         font-size: 28rpx;
                     }
                     .status {
-                        color: #E6212B;
+                        color: #bbb;
                         font-size: 28rpx;
+                        &.nopay {
+                            color: #E6212B;
+                        }
+                        &.paid {
+                            color: #53c21d;
+                        }
+                        &.pending {
+                            color: #333;
+                        }
                     }
                 }
                 .center {
@@ -172,12 +199,10 @@ function onPreview(no) {
                     }
                 }
                 .bottom {
-                    min-height: 146rpx;
+                    padding: 14rpx 0;
                     .row {
                         font-size: 24rpx;
-                        &:not(:first-child) {
-                            margin-top: 20rpx;
-                        }
+                        padding: 10rpx 0;
                     }
                     .value {
                         color: #939393;

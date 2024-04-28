@@ -13,15 +13,13 @@
             <view class="btn app-flex-center" @click="goBooking">去下单</view>
         </view>
         <view class="order-list" v-else>
-            <view class="item" v-for="item in list" @click="onPreview(item.id)">
+            <view class="item" v-for="item in list" @click="onPreview(item)">
                 <view class="top app-flex-center">
                     <view class="app-flex-item app-flex align-center">
                         <app-img src="/static/order/icon-logo.png" w="36" h="36"></app-img>
                         <view class="name">{{shopInfo.storeName}}</view>
                     </view>
-                    <view class="status" v-if="item.orderStatus == 'nopay'">待支付</view>
-                    <view class="status" v-if="item.orderStatus == 'paid'">待核销</view>
-                    <view class="status" v-if="item.orderStatus == 'finish'">已完成</view>
+                    <view class="status" :class="item.orderStatus">{{orderStatus[item.orderStatus]}}</view>
                 </view>
                 <view class="center app-flex space-between">
                     <view class="goods-list app-flex">
@@ -68,6 +66,7 @@ import { reactive, ref } from 'vue'
 import { orderList } from '@/api/order'
 import { userAppStore } from '@/store/app'
 import { onShow, onReachBottom } from '@dcloudio/uni-app'
+import { orderStatus } from '@/common/js/status'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
@@ -123,17 +122,22 @@ function getList(isReset = false) {
     })
 }
 
+function onPreview(row) {
+    let status = row.orderStatus
+    let payPage = '/pages/booking/pay'
+    let detailPage = '/pages/order/order-detail'
+    
+    uni.navigateTo({
+        url: `${status == 'nopay' ? payPage : detailPage}?id=${row.id}&orderNo=${row.orderNo}&status=${status}`
+    })
+}
+
 function goBooking() {
     uni.switchTab({
         url: '/pages/booking/booking'
     })
 }
 
-function onPreview(id) {
-    uni.navigateTo({
-        url: `/pages/order/order-detail?id=${id}`
-    })
-}
 </script>
 
 <style lang="scss">
@@ -172,8 +176,17 @@ function onPreview(id) {
                         font-size: 28rpx;
                     }
                     .status {
-                        color: #E6212B;
+                        color: #bbb;
                         font-size: 28rpx;
+                        &.nopay {
+                            color: #E6212B;
+                        }
+                        &.paid {
+                            color: #53c21d;
+                        }
+                        &.pending {
+                            color: #333;
+                        }
                     }
                 }
                 .center {

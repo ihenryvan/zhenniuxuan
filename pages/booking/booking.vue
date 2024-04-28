@@ -104,7 +104,7 @@
                 </view>
                 <view class="price app-flex app-flex-item">
                     <text>￥</text>
-                    <view class="val">18.9</view>
+                    <view class="val">{{costAmount}}</view>
                 </view>
                 <view class="btn app-flex-center" @click="goPay">立即下单</view>
             </view>
@@ -118,7 +118,7 @@
                         <view class="sub">已选{{cartLen}}件</view>
                     </view>
                     <view class="right app-flex-center" @click="clearTip.isShow = true">
-                        <u-icon name="trash" size="18" color="#ccc" />
+                        <u-icon name="trash" size="18" color="#E6212B" />
                         <text>清空购物车</text>
                     </view>
                 </view>
@@ -209,6 +209,13 @@ let cartList = computed(() => {
         })
     })
     return list
+})
+let costAmount = computed(() => {
+    let isVip = appStore.userInfo.memberGrade == 1
+    let total = cartList.value.reduce((t, c) => {
+        return t + c.num * (isVip ? c.discountPrice : c.sellPrice) * 100
+    }, 0)
+    return (total / 100).toFixed(2)
 })
 let cartLen = computed(() => {
     return cartList.value.reduce((t, g) => {
@@ -471,7 +478,7 @@ function sureClear() {
                     padding: 20rpx 10rpx;
                     margin-right: -10rpx;
                     text {
-                        color: #aaa;
+                        color: #E6212B;
                         font-size: 28rpx;
                         margin-left: 4rpx;
                     }

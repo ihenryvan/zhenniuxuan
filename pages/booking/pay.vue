@@ -19,18 +19,20 @@
         
         <view class="goods-wrap">
             <view class="title">商品信息</view>
-            <view class="goods-cont app-flex align-center">
-                <app-img class="img" radius="8" src="https://p.qqan.com/up/2024-2/2024231347411942.jpg" w="112" h="112"></app-img>
-                <view class="app-flex-item" style="padding-left: 20rpx;">
-                    <view class="app-flex align-center space-between">
-                        <view class="name">2024款 原切澳洲谷饲眼肉盖（烤）</view>
-                        <view class="amount">x1</view>
-                    </view>
-                    <view class="app-flex align-center space-between" style="padding-top: 10rpx;">
-                        <view class="weight">200g</view>
-                        <view class="price">
-                            <text>￥</text>
-                            <view class="val">18.9</view>
+            <view class="good-list">
+                <view class="good-item app-flex align-center" v-for="item in goodList">
+                    <app-img class="img" radius="8" :src="item.image || item.productImage" w="112" h="112"></app-img>
+                    <view class="app-flex-item" style="padding-left: 20rpx;">
+                        <view class="app-flex align-center space-between">
+                            <view class="name">{{item.title || item.productTitle}}</view>
+                            <view class="amount">x{{item.spNum || item.productNum}}</view>
+                        </view>
+                        <view class="app-flex align-center space-between" style="padding-top: 10rpx;">
+                            <view class="weight">{{item.weight}}{{item.unit}}</view>
+                            <view class="price">
+                                <text>￥</text>
+                                <view class="val">{{userInfo.memberGrade == 1 ? item.discountPrice :item.sellPrice}}</view>
+                            </view>
                         </view>
                     </view>
                 </view>
@@ -39,7 +41,7 @@
                 <view class="label">支付金额</view>
                 <view class="price">
                     <text>￥</text>
-                    <view class="val">18.9</view>
+                    <view class="val">{{costAmount}}</view>
                 </view>
             </view>
         </view>
@@ -56,9 +58,9 @@
             <view class="price-wrap app-flex-item">
                 <view class="price">
                     <text>￥</text>
-                    <view class="val">18.9</view>
+                    <view class="val">{{costAmount}}</view>
                 </view>
-                <view class="redu">已优惠 ￥0</view>
+                <!-- <view class="redu">已优惠 ￥0</view> -->
             </view>
             <view class="btn app-flex-center" @click="surePay">立即支付</view>
         </view>
@@ -66,26 +68,45 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { saveOrder } from '@/api/order'
+import { reactive, ref, computed } from 'vue'
+import { saveOrder, orderDetail, payOrder } from '@/api/order'
 import { cartGoods } from '@/api/booking'
 import { userAppStore } from '@/store/app'
 import { onLoad } from '@dcloudio/uni-app'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
-let list = ref([])
+let userInfo = appStore.userInfo
+let goodList = ref([])
+let orderNo = ''
+
+let costAmount = computed(() => {
+    let isVip = userInfo.memberGrade == 1
+    let total = goodList.value.reduce((t, c) => {
+        return t + (c.spNum || c.productNum) * (isVip ? c.discountPrice : c.sellPrice) * 100
+    }, 0)
+    return (total / 100).toFixed(2)
+})
 
 onLoad(option => {
-    if (option.id) { // 从订单列表页进入
-        
-    } else { // 从下单页进入
+    let orderId = option.id
+    orderNo = option.orderNo ?? ''
+    if (orderId && orderNo) {
+        getDetail(orderId)
+    } else {
         getCartGoods()
     }
 })
 
 function getCartGoods() {
     cartGoods({storeId: shopInfo.id}).then(data => {
+        goodList.value = data
+    })
+}
+
+function getDetail(id) {
+    orderDetail({id}).then(data => {
+        goodList.value = data.productList
     })
 }
 
@@ -93,24 +114,37 @@ function surePay() {
     uni.showLoading({
         title: '正在拉起支付'
     })
-    saveOrder({storeId: shopInfo.id}).then(data => {
-        uni.requestPayment({
-            provider: 'wxpay',
-            timeStamp: data.signMap.timeStamp,
-            nonceStr: data.signMap.nonceStr,
-            package: data.signMap.package,
-            signType: data.signMap.signType,
-            paySign: data.signMap.paySign,
-            success: function(res) {
-                goOrderPage()
-            },
-            fail: function(err) {
-                goOrderPage()
-                console.log('err:' + JSON.stringify(err))
-            }
+    
+    if (orderNo) {
+        payOrder({orderNo}).then(data => {
+            commitPay(data)
+        }).finally(() => {
+            uni.hideLoading()
         })
-    }).finally(() => {
-        uni.hideLoading()
+    } else {
+        saveOrder({storeId: shopInfo.id}).then(data => {
+            commitPay(data)
+        }).finally(() => {
+            uni.hideLoading()
+        })
+    }
+}
+
+function commitPay(data) {
+    uni.requestPayment({
+        provider: 'wxpay',
+        timeStamp: data.signMap.timeStamp,
+        nonceStr: data.signMap.nonceStr,
+        package: data.signMap.package,
+        signType: data.signMap.signType,
+        paySign: data.signMap.paySign,
+        success(res) {
+            goOrderPage()
+        },
+        fail(err) {
+            goOrderPage()
+            console.log('err:' + JSON.stringify(err))
+        }
     })
 }
 
@@ -175,8 +209,11 @@ function onPreview(no) {
             .title {
                 font-size: 32rpx;
             }
-            .goods-cont {
-                padding-top: 32rpx;
+            .good-list {
+                padding-top: 12rpx;
+                .good-item {
+                    padding-top: 20rpx;
+                }
                 .name {
                     font-size: 28rpx;
                 }
@@ -184,7 +221,8 @@ function onPreview(no) {
                     color: #939393;
                     font-size: 26rpx;
                 }
-                .weight {
+                .val {
+                    font-size: 26rpx;
                 }
             }
             .pay-amount {
@@ -206,7 +244,8 @@ function onPreview(no) {
                 font-size: 32rpx;
             }
             text {
-                font-size: 28rpx;   
+                font-size: 28rpx;
+                padding-left: 10rpx;
             }
         }
         
