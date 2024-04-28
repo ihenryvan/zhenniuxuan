@@ -9,6 +9,7 @@
                     </view>
                     <view class="status-txt" style="padding-top: 16rpx;">核销码</view>
                     
+                    <canvas id="qrcode" canvas-id="qrcode" style="width: 200px;height: 200px;"></canvas>
                 </template>
                 <template v-else>
                     <view class="app-flex-center">
@@ -89,11 +90,14 @@ import { orderDetail, genCode } from '@/api/order'
 import { userAppStore } from '@/store/app'
 import { orderStatus } from '@/common/js/status'
 import { onLoad } from '@dcloudio/uni-app'
+import UQRCode from '@/uni_modules/uqrcode'
 
 onLoad(option => {
     status.value = option.status
     getDetail(option.id)
     getCode(option.id)
+    
+    draw()
 })
 
 let appStore = userAppStore()
@@ -117,6 +121,25 @@ function goMap() {
         name: shopInfo.storeName,
         address: shopInfo.address
     })
+}
+
+function draw() {
+    // 获取uQRCode实例
+    var qr = new UQRCode();
+    // 设置二维码内容
+    qr.data = "https://uqrcode.cn/doc";
+    // 设置二维码大小，必须与canvas设置的宽高一致
+    qr.size = 200;
+    // 调用制作二维码方法
+    qr.make();
+    // 获取canvas元素
+    var canvas = document.getElementById("qrcode");
+    // 获取canvas上下文
+    var canvasContext = canvas.getContext("2d");
+    // 设置uQRCode实例的canvas上下文
+    qr.canvasContext = canvasContext;
+    // 调用绘制方法将二维码图案绘制到canvas上
+    qr.drawCanvas();
 }
 
 function getCode(id) {
