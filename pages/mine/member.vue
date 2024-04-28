@@ -14,7 +14,6 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { userAppStore } from '@/store/app'
-import { getVideo } from '@/api/photo'
 
 let appStore = userAppStore()
 let popup = reactive({

@@ -8,6 +8,8 @@
                         <app-img src="/static/order/code.png" w="258" h="258"></app-img>
                     </view>
                     <view class="status-txt" style="padding-top: 16rpx;">核销码</view>
+                    
+                    <ayQrcode ref="qrcode" :modal="modal_qr" :url="url" @hideQrcode="hideQrcode" :height="300" :width="300" />
                 </template>
                 <template v-else>
                     <view class="app-flex-center">
@@ -17,7 +19,7 @@
                 </template>
             </view>
             <view class="loc-wrap app-flex align-center space-between">
-                <view class="app-flex-center">
+                <view class="app-flex-item">
                     <view class="shop-info app-flex align-center">
                         <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
                         <view class="name">{{shopInfo.storeName}}</view>
@@ -27,8 +29,9 @@
                         <text>距离您14.10km</text>
                     </view>
                 </view>
-                <view class="nav">
-                    
+                <view class="nav" @click="goMap">
+                    <app-img src="/static/order/icon-nav.png" w="48" h="48"></app-img>
+                    <view class="label">导航</view>
                 </view>
             </view>
         </view>
@@ -83,7 +86,7 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { orderDetail } from '@/api/order'
+import { orderDetail, genCode } from '@/api/order'
 import { userAppStore } from '@/store/app'
 import { orderStatus } from '@/common/js/status'
 import { onLoad } from '@dcloudio/uni-app'
@@ -91,6 +94,7 @@ import { onLoad } from '@dcloudio/uni-app'
 onLoad(option => {
     status.value = option.status
     getDetail(option.id)
+    getCode(option.id)
 })
 
 let appStore = userAppStore()
@@ -107,7 +111,17 @@ function getDetail(id) {
     })
 }
 
-function onPreview(no) {
+function goMap() {
+    uni.openLocation({
+        latitude: Number(shopInfo.latitude),
+        longitude: Number(shopInfo.longitude),
+        name: shopInfo.storeName,
+        address: shopInfo.address
+    })
+}
+
+function getCode(id) {
+    genCode({id})
 }
 </script>
 
@@ -130,25 +144,38 @@ function onPreview(no) {
                     text-align: center;
                 }
             }
-            .shop-info {
+            .loc-wrap {
+                min-height: 150rpx;
                 border-top: solid 1px #F7F8FA;
-                padding-top: 30rpx;
-                .name {
-                    font-size: 30rpx;
-                    padding-left: 16rpx;
+                .shop-info {
+                    .name {
+                        font-size: 30rpx;
+                        padding-left: 16rpx;
+                    }
+                    .icon {
+                        position: relative;
+                        top: 4rpx;
+                    }
                 }
-                .icon {
-                    position: relative;
-                    top: 4rpx;
+                
+                .doc-info {
+                    padding-top: 16rpx;
+                    padding-left: 2rpx;
+                    text {
+                        color: #939393;
+                        font-size: 28rpx;
+                        margin-left: 14rpx;
+                    }
                 }
-            }
-            .doc-info {
-                padding-top: 16rpx;
-                padding-left: 2rpx;
-                text {
-                    color: #939393;
-                    font-size: 28rpx;
-                    margin-left: 14rpx;
+                .nav {
+                    text-align: center;
+                    padding-left: 10rpx;
+                    .label {
+                        position: relative;
+                        right: 2rpx;
+                        font-size: 26rpx;
+                        padding-top: 10rpx;
+                    }
                 }
             }
         }

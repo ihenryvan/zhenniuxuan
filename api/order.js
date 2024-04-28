@@ -22,6 +22,10 @@ export const payOrder = (data)=>{
 	return request.post('/api/order/pay', data)
 }
 
+// 获取订单核销码
+export const genCode = (data)=>{
+	return request.get('/api/order/verifycode', data, { 'content-type': 'application/json' })
+}
 
 
 

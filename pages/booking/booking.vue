@@ -268,8 +268,11 @@ function getListData(storeId) { // 原来叫getCateList
         cateList.value = JSON.parse(JSON.stringify(list))
         
         let pArr = []
-        list.forEach(item => {
+        list.forEach((item, i) => {
             pArr.push(api.getGoods({ storeId, cateId: item.id }).then(gList => {
+                if (i === 0) {
+                    console.log('list', JSON.stringify(gList));
+                }
                 gList.forEach(g => {
                     g.num = 0
                 })

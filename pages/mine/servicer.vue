@@ -18,7 +18,6 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
 
 function goChat(e) {
     uni.showToast({

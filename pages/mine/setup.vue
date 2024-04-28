@@ -21,7 +21,6 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
 
 function goProtocal(data) {
     uni.navigateTo({

@@ -44,7 +44,6 @@
 
 <script setup>
 import { reactive, ref } from 'vue'
-import { getVideo } from '@/api/photo'
 
 let popup = reactive({
     show: false,
