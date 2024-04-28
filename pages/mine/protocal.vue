@@ -1,27 +1,23 @@
 <template>
     <view class="page-wrap">
-        <app-navbar title="关于我们" />
-        
-        <app-img src="/static/mine/about-bg.png" w="750" h="678"></app-img>
-        
+        <!-- <u-navbar bgColor="#fff" :title="title" :auto-back="true" :placeholder="true" /> -->
         <view class="page-cont">
-            <view class="center">
-                <app-img src="/static/mine/about-logo.png" w="212" h="212"></app-img>
-            </view>
-            <view class="center gap">
-                <text class="name">XMATE LIVE</text>
-            </view>
-            <view class="center gap">
-                <text class="co">易维空间技术（深圳）有限公司</text>
-            </view>
-            <view class="center gap">
-                <text class="copy">版权所有 @2024-2025 欢迎惠顾！</text>
-            </view>
+            <web-view :src="config.REQUEST_URL+url"></web-view>
         </view>
     </view>
 </template>
 
 <script setup>
+    import { ref } from 'vue'
+    import { onLoad } from '@dcloudio/uni-app'
+    import config from '@/config'
+    
+    let url = ref('')
+    let title = ref('')
+    onLoad(option => {
+        url.value = option.url
+        title.value = option.title
+    })
 </script>
 
 <style lang="scss">

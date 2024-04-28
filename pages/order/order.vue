@@ -8,7 +8,7 @@
         </u-sticky>
         
         <view class="no-login" v-if="!appStore.hasLogin">
-            <view class="tip">您还没有登陆~</view>
+            <view class="tip">您还没有登录~</view>
             <view class="theme-btn app-flex-center" @click="goLogin">去登陆</view>
         </view>
         <view class="no-data" v-else-if="loading == 'nomore' && total == 0">

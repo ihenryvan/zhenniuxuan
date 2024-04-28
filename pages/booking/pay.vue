@@ -2,10 +2,11 @@
     <u-navbar bgColor="#fff" title="到店自提" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
         <view class="info-wrap">
-            <view class="shop-info app-flex align-center">
+            <view class="shop-info app-flex align-center" @click="goMap">
                 <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
                 <view class="name">{{shopInfo.storeName}}</view>
-                <!-- <u-icon class="icon" name="arrow-right" size="16" color="#333" /> -->
+                <view class="app-flex-item"></view>
+                <u-icon class="icon" name="arrow-right" size="16" color="#333" />
             </view>
             <!-- <view class="doc-info app-flex align-center">
                 <u-icon name="map" size="18" color="#666" />
@@ -158,6 +159,15 @@ function onPreview(no) {
     // popup.show = true
     uni.navigateTo({
         url: `/pages/photo/detail?no=${no}`
+    })
+}
+
+function goMap() {
+    uni.openLocation({
+        latitude: Number(shopInfo.latitude),
+        longitude: Number(shopInfo.longitude),
+        name: shopInfo.storeName,
+        address: shopInfo.address
     })
 }
 </script>

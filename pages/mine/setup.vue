@@ -2,18 +2,18 @@
     <u-navbar bgColor="#fff" title="设置" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
         <view class="list">
-            <view class="item app-flex-center" @click="goProtocal">
+            <view class="item app-flex-center" @click="goProtocal({url: '/wap/policy/agreement'})">
                 <view class="label app-flex-item">服务协议</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="item app-flex-center" @click="goProtocal">
+            <view class="item app-flex-center" @click="goProtocal({url: '/wap/policy/privacy'})">
                 <view class="label app-flex-item">隐私政策</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
             </view>
-            <view class="item app-flex-center" @click="goProtocal">
+            <!-- <view class="item app-flex-center" @click="goProtocal">
                 <view class="label app-flex-item">关于我们</view>
                 <u-icon name="arrow-right" size="16" color="#333" />
-            </view>
+            </view> -->
         </view>
     </view>
     
@@ -23,10 +23,9 @@
 import { reactive, ref } from 'vue'
 import { getVideo } from '@/api/photo'
 
-function goProtocal() {
-    uni.showToast({
-        title: '敬请期待',
-        icon: 'none'
+function goProtocal(data) {
+    uni.navigateTo({
+        url: `/pages/mine/protocal?title=${data.title}&url=${data.url}`
     })
 }
 </script>

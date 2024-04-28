@@ -242,7 +242,7 @@ let clearTip = reactive({
 })
 
 onShow(() => {
-    if (goodsList.value.length) {
+    if (appStore.hasLogin && goodsList.value.length) {
         updateCartData()
     }
 })
@@ -405,10 +405,16 @@ function closeCartPopup() {
 
 function onDetail(info) {
     if (!appStore.hasLogin) {
-        return uni.showToast({
-            title: '请先登陆',
+        uni.showToast({
+            title: '请先登录',
             icon: 'none'
         })
+        setTimeout(() => {
+            uni.switchTab({
+                url: '/pages/mine/mine'
+            })
+        }, 600)
+        return
     }
     
     uni.hideTabBar()
@@ -431,10 +437,16 @@ function updateCarData(type, row) {
 }
 function updateCarNum(type, cateIndex, goodIndex, row) {
     if (!appStore.hasLogin) {
-        return uni.showToast({
-            title: '请先登陆',
+        uni.showToast({
+            title: '请先登录',
             icon: 'none'
         })
+        setTimeout(() => {
+            uni.switchTab({
+                url: '/pages/mine/mine'
+            })
+        }, 600)
+        return
     }
     
     let isAdd = type !== 1

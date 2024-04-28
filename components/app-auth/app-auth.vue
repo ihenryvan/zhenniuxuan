@@ -30,9 +30,9 @@
             		<u-checkbox shape="circle" activeColor="#E6212B" iconSize="36rpx" />
             	</u-checkbox-group>
             	<text>我已阅读并同意</text>
-            	<text class="protocol" @tap="goProtocol('user_agreement')">《用户服务协议》</text>
+            	<text class="protocol" @tap="goProtocol({url: '/wap/policy/agreement'})">《用户服务协议》</text>
             	<text>和</text>
-            	<text class="protocol" @tap="goProtocol('privacy_policy')">《隐私政策》</text>
+            	<text class="protocol" @tap="goProtocol({url: '/wap/policy/privacy'})">《隐私政策》</text>
             </view>
         </view>
     </view>
@@ -187,9 +187,9 @@
         })
     }
     
-    function goProtocol(type) {
+    function goProtocol(data) {
         uni.navigateTo({
-            url: `/pages/mine/protocol?type=${type}`
+            url: `/pages/mine/protocal?title=${data.title}&url=${data.url}`
         })
     }
 

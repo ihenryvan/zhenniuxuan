@@ -67,7 +67,7 @@
     function onPay() {
         if (!appStore.hasLogin) {
             // return uni.showToast({
-            //     title: '请先登陆',
+            //     title: '请先登录',
             //     icon: 'none'
             // })
             return emit('fail')

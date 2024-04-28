@@ -16,13 +16,20 @@
                     <view class="status-txt">感谢您的光临</view>
                 </template>
             </view>
-            <view class="shop-info app-flex align-center">
-                <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
-                <view class="name">{{shopInfo.storeName}}</view>
-            </view>
-            <view class="doc-info app-flex align-center">
-                <u-icon name="map" size="18" color="#666" />
-                <text>距离您14.10km</text>
+            <view class="loc-wrap app-flex align-center space-between">
+                <view class="app-flex-center">
+                    <view class="shop-info app-flex align-center">
+                        <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
+                        <view class="name">{{shopInfo.storeName}}</view>
+                    </view>
+                    <view class="doc-info app-flex align-center">
+                        <u-icon name="map" size="18" color="#666" />
+                        <text>距离您14.10km</text>
+                    </view>
+                </view>
+                <view class="nav">
+                    
+                </view>
             </view>
         </view>
         
