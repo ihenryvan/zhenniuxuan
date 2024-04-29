@@ -133,7 +133,7 @@ function onPreview(row) {
     let detailPage = '/pages/order/order-detail'
     
     uni.navigateTo({
-        url: `${status == 'nopay' ? payPage : detailPage}?id=${row.id}&orderNo=${row.orderNo}&status=${status}`
+        url: `${status == 'nopay' ? payPage : detailPage}?id=${row.id}&orderNo=${row.orderNo}`
     })
 }
 

@@ -1,6 +1,8 @@
 <template>
     <u-navbar bgColor="#fff" :title="orderStatus[status]" :auto-back="true" :placeholder="true" />
-    <view class="page-wrap">
+     
+    <u-loading-page :loading="!isInit" loadingText="加载中" iconSize="32" fontSize="15"></u-loading-page>
+    <view class="page-wrap" v-if="isInit">
         <view class="info-wrap">
             <view class="status-info">
                 <template v-if="status == 'paid'">
@@ -15,7 +17,7 @@
                         <view v-if="codeLoading">（加载中）</view>
                         <view class="app-flex-center" v-else>
                             <text>（</text>
-                            <u-count-down ref="countDownRef" :time="5 * 1000" format="ss" :autoStart="false" @finish="onFinish" />
+                            <u-count-down ref="countDownRef" :time="10 * 1000" format="ss" :autoStart="false" @finish="onFinish" />
                             <text>秒后刷新</text>
                             <text>）</text>
                         </view>
@@ -99,26 +101,28 @@ import { reactive, ref, nextTick } from 'vue'
 import { orderDetail, genCode } from '@/api/order'
 import { userAppStore } from '@/store/app'
 import { orderStatus } from '@/common/js/status'
-import { onLoad, onHide } from '@dcloudio/uni-app'
+import { onLoad, onShow, onHide } from '@dcloudio/uni-app'
 import UQRCode from 'uqrcodejs'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
 let status = ref('')
 let info = ref({})
+let isInit = ref(false)
 let codeLoading = ref(false)
 let countDownRef = ref(null)
 let orderId = ''
+let isBeat = true
 
 onLoad(option => {
     orderId = option.id
-    status.value = option.status
-    getCode(orderId)
-    getDetail(orderId)
+    getDetail()
 })
-
+onShow(() => {
+    isBeat = true
+})
 onHide(() => {
-    
+    isBeat = false
 })
 
 
@@ -148,20 +152,30 @@ function drawCode(code) {
     qr.drawCanvas();
     
     setTimeout(() => {
-        countDownRef.value.start()
+        countDownRef.value?.start()
     }, 1000)
 }
 
 function onFinish() {
-    getCode(orderId)
+    if (isBeat) {
+        getDetail()
+    }
 }
 
-function getDetail(id) {
-    orderDetail({ id }).then(data => {
+function getDetail() {
+    orderDetail({ id: orderId }).then(data => {
+        let orderStatus = data.orderStatus
+        status.value = orderStatus
+        if (orderStatus == 'paid') {
+            getCode(orderId)
+        }
+        
         data.totalNum = data.productList.reduce((t, c) => {
             return t + c.productNum
         }, 0)
         info.value = data
+    }).finally(() => {
+        isInit.value = true
     })
 }
 
