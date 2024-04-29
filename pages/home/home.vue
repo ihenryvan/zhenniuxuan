@@ -21,21 +21,20 @@
         <view class="page-cont">
             <view class="grid-list">
                 <u-grid :border="false">
-                    <u-grid-item v-for="(item, index) in gridList" :key="index" style="margin: 14rpx 0;" @click="goMeat">
-                        <!-- <view> -->
-                            <app-img :src="`/static/home/grid-icon${index}.png`" w="80" h="80"></app-img>
-                            <text class="grid-text">{{item}}</text>
-                        <!-- </view> -->
+                    <u-grid-item v-for="(item, index) in gridList" :key="index" style="margin: 14rpx 0;" @click="goMeat(item.id)">
+                            <!-- <app-img :src="`/static/home/grid-icon${index}.png`" w="80" h="80"></app-img> -->
+                            <app-img :src="item.categoryImage" w="80" h="80"></app-img>
+                            <text class="grid-text">{{item.categoryName}}</text>
                     </u-grid-item>
                 </u-grid>
             </view>
             
             <view class="bar-wrap app-flex space-between">
-                <view class="item app-flex-center">
+                <view class="item app-flex-center" @tap="goProtocol({url: '/wap/intro/company'})">
                     <app-img src="/static/home/bar-icon0.png" w="78" h="78"></app-img>
-                    <text>公司介绍</text>
+                    <text>公司介绍{{shopInfo.id}}</text>
                 </view>
-                <view class="item app-flex-center">
+                <view class="item app-flex-center" @tap="goProtocol({url: '/wap/intro/quality'})">
                     <app-img src="/static/home/bar-icon1.png" w="68" h="68"></app-img>
                     <text>品质介绍</text>
                 </view>
@@ -67,8 +66,13 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-// import { getShopList } from '@/api/home'
+import { reactive, ref, watch } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { userAppStore } from '@/store/app'
+import { getShopCate } from '@/api/booking'
+
+let appStore = userAppStore()
+let shopInfo = appStore.shopInfo
 
 let phone = ref('15338841454')
 let popup = reactive({
@@ -82,13 +86,31 @@ let gridList = ref(['吊龙', '肋条', '牛腱子', '牛腩', '牛肉', '雪花
 //     }
 // })
 
-// getShopList({latitude: 22.67412, longitude: 114.035825})
+onShow(() => {
+    getCateList()
+})
 
-function goMeat() {
-    uni.switchTab({
-        url: '/pages/booking/booking'
+function getCateList() {
+    getShopCate({storeId: 10000}).then(list => {
+        if (list.length === 0) return
+        
+        gridList.value = list.slice(0, 6)
     })
 }
+
+function goMeat(id) {
+    uni.setStorageSync('initCateId', id)
+    uni.switchTab({
+        url: `/pages/booking/booking?id=${id}`
+    })
+}
+
+function goProtocol(data) {
+    uni.navigateTo({
+        url: `/pages/mine/protocal?title=${data.title}&url=${data.url}`
+    })
+}
+
 function onPreview(data) {
     // popup.show = true
     uni.navigateTo({

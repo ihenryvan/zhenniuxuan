@@ -15,7 +15,7 @@
             </view> -->
             <view class="time-info app-flex space-between">
                 <view class="label">自提时间</view>
-                <view class="value">约14:39可取</view>
+                <view class="value">{{shopInfo.openTime}}-{{shopInfo.closeTime}} 可到店取</view>
             </view>
         </view>
         

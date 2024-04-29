@@ -6,6 +6,7 @@ export const userAppStore = defineStore('app', {
             hasLogin: false,
             userInfo: {},
             shopInfo: {
+                id: '',
                 storeName: '45店铺'
             }
         }

@@ -1,9 +1,9 @@
 // 是否是开发环境   true:是  false:不是
 const isDevelop = true
 // 基础地址   开发环境:线上环境
-const BASE_URL = isDevelop ? `https://znx.zhjfd.com/` : `https://znx.zhjfd.com/`
+const BASE_URL = isDevelop ? 'https://znx.zhjfd.com/' : 'aznx.zniux.com/'
 // 项目名称    开发环境:线上环境
-const PROJECT_NAME = isDevelop ? `zniux-api` : `zniux-api`
+const PROJECT_NAME = isDevelop ? 'zniux-api' : 'zniux-api'
 //请求地址
 const REQUEST_URL = `${BASE_URL}${PROJECT_NAME}`
 // 图片访问地址

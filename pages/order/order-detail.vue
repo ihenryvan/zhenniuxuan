@@ -36,10 +36,10 @@
                         <app-img src="/static/booking/icon-shop.png" w="40" h="40"></app-img>
                         <view class="name">{{shopInfo.storeName}}</view>
                     </view>
-                    <view class="doc-info app-flex align-center">
+                    <!-- <view class="doc-info app-flex align-center">
                         <u-icon name="map" size="18" color="#666" />
                         <text>距离您14.10km</text>
-                    </view>
+                    </view> -->
                 </view>
                 <view class="nav" @click="goMap">
                     <app-img src="/static/order/icon-nav.png" w="48" h="48"></app-img>
@@ -119,6 +119,7 @@ onLoad(option => {
     getDetail()
 })
 onShow(() => {
+    countDownRef.value?.start()
     isBeat = true
 })
 onHide(() => {
@@ -225,6 +226,7 @@ function goMap() {
             }
             .loc-wrap {
                 min-height: 150rpx;
+                min-height: 120rpx;
                 border-top: solid 1px #F7F8FA;
                 .shop-info {
                     .name {

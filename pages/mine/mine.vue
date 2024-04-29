@@ -21,15 +21,15 @@
         <view class="amount-wrap app-flex">
             <view class="item">
                 <view class="label">优惠券</view>
-                <view class="value">0</view>
+                <view class="value">{{userInfo.voucher ?? 0}}</view>
             </view>
             <view class="item">
                 <view class="label">余额</view>
-                <view class="value">0</view>
+                <view class="value">{{userInfo.balance ?? 0}}</view>
             </view>
             <view class="item">
-                <view class="label">消息</view>
-                <view class="value">0</view>
+                <view class="label">积分</view>
+                <view class="value">{{userInfo.score ?? 0}}</view>
             </view>
         </view>
         
@@ -70,11 +70,21 @@
 
 <script setup>
     import { userAppStore } from '@/store/app'
+    import { getUserInfo } from '@/api/mine'
+    import { onShow } from '@dcloudio/uni-app'
     import { ref, defineComponent, reactive } from 'vue'
     
     
     let appStore = userAppStore()
     let authRef = ref(null)
+    let userInfo = ref({})
+    
+    onShow(option => {
+        if (!appStore.hasLogin) return
+        getUserInfo().then(data => {
+            userInfo.value = data
+        })
+    })
     
     function onAuth() {
         if (!appStore.hasLogin) {

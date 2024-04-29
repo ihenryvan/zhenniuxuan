@@ -1,6 +1,9 @@
 <template>
     <u-popup :show="isShow" @close="close">
-        <view class="good-detail">
+        <view v-if="!isInit" class="app-flex-center" style="min-height: 30vh;">
+            <u-loading-icon text="加载中" textSize="15" mode="circle"></u-loading-icon>
+        </view>
+        <view class="good-detail" v-else>
             <view class="func-wrap app-flex-center">
                 <view class="func-icon">
                     <!-- <app-img src="/static/common/icon-share.png" w="52" h="52"></app-img> -->
@@ -10,7 +13,12 @@
                 </view>
             </view>
             
-            <app-img :src="info.image" w="750" h="480"></app-img>
+            <swiper circular autoplay style="height: 480rpx;" v-if="info.banners">
+                <swiper-item v-for="img in info.banners.split(',')">
+                    <app-img :src="img" w="750" h="480"></app-img>
+                </swiper-item>
+            </swiper>
+            
             <view class="good-cont">
                 <view class="title">{{info.title}}</view>
                 <view class="info">
@@ -27,7 +35,10 @@
                 </view>
                 
                 <u-divider text="" lineColor="#eee"></u-divider>
-                <view class="intro">{{info.details ?? '--'}}</view>
+                <view class="intro">
+                    <view v-if="info.details" v-html="info.details"></view>
+                    <view v-else>暂无简介~</view>
+                </view>
                 <u-divider text="" lineColor="#eee"></u-divider>
                 
                 <view class="price-wrap app-flex-center">
@@ -75,9 +86,9 @@
 
     let appStore = userAppStore()
     let emit = defineEmits(['closed', 'changed'])
+    let isInit = ref(false)
     let isShow = ref(false)
     let info = ref({})
-    let params = {}
     let props = defineProps({
         id: {
             required: true,
@@ -89,6 +100,8 @@
         goodsDetail({spId}).then(data => {
             info.value = data ?? {}
             info.value.num = 1
+        }).finally(() => {
+            isInit.value = true
         })
     }
     
@@ -165,6 +178,9 @@
                 font-size: 28rpx;
                 line-height: 44rpx;
                 margin: -8rpx 0;
+                image {
+                    max-width: 100%;
+                }
             }
             .price-wrap {
                 margin-top: -10rpx;

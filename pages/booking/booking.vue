@@ -65,7 +65,7 @@
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
                                             <text>￥</text>
-                                            <view class="val">{{good.sellPrice}}</view>
+                                            <view class="val">{{good.discountPrice}}</view>
                                         </view>
                                         
                                         <u-number-box :min="0" :value="good.num">
@@ -177,7 +177,7 @@
 
 <script setup>
 import { reactive, ref, computed, watch, nextTick } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onHide, onUnload } from '@dcloudio/uni-app'
 import { userAppStore } from '@/store/app'
 import * as api from '@/api/booking'
 
@@ -245,6 +245,29 @@ onShow(() => {
     if (appStore.hasLogin && goodsList.value.length) {
         updateCartData()
     }
+    
+    
+    let initCateId = uni.getStorageSync('initCateId')
+    if (initCateId) {
+        if (cateList.value.length) {
+            setTimeout(() => {
+                let goalIndex = cateList.value.findIndex(item => item.id == initCateId)
+                onChangeCate(goalIndex)
+                clearStorage()
+            }, 500)
+        } else {
+            setTimeout(() => {
+                if (cateList.value.length) {
+                    let goalIndex = cateList.value.findIndex(item => item.id == initCateId)
+                    onChangeCate(goalIndex)
+                    clearStorage()
+                }
+            }, 2000)
+        }
+    }
+})
+onHide(() => {
+    clearStorage()
 })
 
 initPage()
@@ -434,11 +457,13 @@ function goPay() {
         url: `./pay?storeId=${shopInfo.id}`
     })
 }
+
 function updateCarData(type, row) {
     console.log(type, row);
     let indexArr = row.indexData.split('-')
     updateCarNum(type, indexArr[0], indexArr[1], row)
 }
+
 function updateCarNum(type, cateIndex, goodIndex, row) {
     if (!appStore.hasLogin) {
         uni.showToast({
@@ -471,6 +496,13 @@ function sureClear() {
             goodsList.value[indexArr[0]].gList[indexArr[1]].num = 0
         })
     })
+}
+
+function clearStorage() {
+    if (uni.getStorageSync('initCateId')) {
+        console.log(0);
+        uni.removeStorageSync('initCateId')
+    }
 }
 </script>
 

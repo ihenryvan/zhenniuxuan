@@ -3,7 +3,7 @@
         <u-sticky>
             <u-navbar bgColor="#fff" title="订单" leftIcon="" :placeholder="true" />
             <view style="background: #fff;">
-                <u-tabs :list="tabList" :scrollable="false" lineColor="#E6212B" :activeStyle="{ color: '#E6212B' }"></u-tabs>
+                <u-tabs :list="tabList" :scrollable="false" @change="onTabChange" lineColor="#E6212B" :activeStyle="{ color: '#E6212B' }"></u-tabs>
             </view>
         </u-sticky>
         
@@ -14,7 +14,7 @@
         <view class="no-data" v-else-if="loading == 'nomore' && total == 0">
             <app-img src="/static/order/no-order.png" w="392" h="318" margin="0 auto"></app-img>
             <view class="txt">暂无订单</view>
-            <view class="theme-btn app-flex-center" @click="goBooking">去下单</view>
+            <view class="theme-btn app-flex-center" @click="goBooking" v-if="tabIndex != 2">去下单</view>
         </view>
         <view class="order-list" v-else>
             <view class="item" v-for="item in list" @click="onPreview(item)">
@@ -82,10 +82,8 @@ let tabList = ref([
     {name: '门店订单'},
     {name: '售后'},
 ])
-let params = {
-    pageNum: 1,
-    pageSize: 8,
-}
+let params = {}
+let tabIndex = ref(0)
 
 onShow(() => {
     if (appStore.hasLogin) {
@@ -97,9 +95,19 @@ onReachBottom((aa) => {
     getList()
 })
 
+function onTabChange(data) {
+    tabIndex.value = data.index
+    getList(true)
+}
+
 function getList(isReset = false) {
-    
     if (isReset) {
+        params = { pageSize: 8 }
+        if (tabIndex.value == 1) {
+            params.bizType = 'offline'
+        } else if (tabIndex.value == 2) {
+            params.orderStatus = 'refunded'
+        }
         params.pageNum = 1
         loading.value = 'loading'
     }
@@ -108,7 +116,7 @@ function getList(isReset = false) {
     orderList(params).then(data => {
         // data.total = 0
         if (data.total == 0) {
-            return loading.value = 'nomore'
+            loading.value = 'nomore'
         }
         
         total.value = data.total
@@ -119,6 +127,13 @@ function getList(isReset = false) {
             item.totalNum = totalNum
         })
         list.value = isReset ? JSON.parse(JSON.stringify(data.rows)) : list.value.concat(data.rows)
+        if (list.value.length && isReset) {
+            setTimeout(() => {
+                uni.pageScrollTo({
+                    scrollTop: 0
+                })
+            }, 200)
+        }
         params.pageNum++
         
         if (list.value.length >= total.value) {
