@@ -160,7 +160,7 @@
         </u-popup>
     </view>
     
-    <app-goods-detail ref="detailRef" @closed="onDetailPopupClosed" />
+    <app-goods-detail ref="detailRef" @closed="onDetailPopupClosed" @changed="onPopupCartChanged" />
     
     <u-modal
         asyncClose
@@ -425,6 +425,10 @@ function onDetailPopupClosed() {
     uni.showTabBar()
 }
 
+function onPopupCartChanged(id, num) {
+    updateCartData()
+}
+
 function goPay() {
     uni.navigateTo({
         url: `./pay?storeId=${shopInfo.id}`
@@ -451,7 +455,7 @@ function updateCarNum(type, cateIndex, goodIndex, row) {
     
     let isAdd = type !== 1
     
-    api[isAdd ? 'addCart' : 'deductCart']({spId: row.id, storeId: shopInfo.id}).then(() => {
+    api[isAdd ? 'addCart' : 'deductCart']({spId: row.id, storeId: shopInfo.id, spNum: 1}).then(() => {
         // row.num = isAdd ? ++row.num : --row.num
         // api.cartNum({storeId: shopInfo.id}) 查看数量
         goodsList.value[cateIndex].gList[goodIndex].num = isAdd ? ++row.num : --row.num

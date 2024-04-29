@@ -17,7 +17,7 @@
                         <view v-if="codeLoading">（加载中）</view>
                         <view class="app-flex-center" v-else>
                             <text>（</text>
-                            <u-count-down ref="countDownRef" :time="10 * 1000" format="ss" :autoStart="false" @finish="onFinish" />
+                            <u-count-down ref="countDownRef" :time="60 * 1000" format="mm:ss" :autoStart="false" @finish="onFinish" />
                             <text>秒后刷新</text>
                             <text>）</text>
                         </view>

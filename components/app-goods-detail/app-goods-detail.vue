@@ -61,7 +61,7 @@
                     </view>
                 </view>
                 
-                <view class="btn app-flex-center">加入购物袋</view>
+                <view class="btn app-flex-center" @click="addToCart">加入购物袋</view>
             </view>
         </view>
     </u-popup>
@@ -69,13 +69,12 @@
 
 <script setup>
     import { ref, reactive } from 'vue'
-    import { goodsDetail } from '@/api/booking'
-    
     import config from '@/config'
+    import { goodsDetail, addCart } from '@/api/booking'
     import { userAppStore } from '@/store/app'
 
     let appStore = userAppStore()
-    let emit = defineEmits(['closed'])
+    let emit = defineEmits(['closed', 'changed'])
     let isShow = ref(false)
     let info = ref({})
     let params = {}
@@ -94,8 +93,6 @@
     }
     
     function open(id) {
-        // let data = Object.assign({}, objData, {num: 1})
-        // info.value = data
         getDetail(id)
         isShow.value = true
     }
@@ -108,6 +105,14 @@
     
     function changeNum(data) {
         info.value.num = data.value
+    }
+    
+    function addToCart() {
+        let { id, num } = info.value
+        close()
+        addCart({spId: id, storeId: appStore.shopInfo.id, spNum: num}).then(() => {
+            emit('changed', id, num)
+        })
     }
 
     defineExpose({
