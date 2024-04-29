@@ -1,5 +1,6 @@
 <template>
-    <u-navbar bgColor="#fff" title="到店自提" :auto-back="true" :placeholder="true" />
+    <!-- <u-navbar bgColor="#fff" title="到店自提" :auto-back="true" :placeholder="true" /> -->
+    <u-navbar bgColor="#fff" title="支付订单" :auto-back="true" :placeholder="true" />
     <view class="page-wrap">
         <view class="info-wrap">
             <view class="shop-info app-flex align-center" @click="goMap">
@@ -32,7 +33,7 @@
                             <view class="weight">{{item.weight}}{{item.unit}}</view>
                             <view class="price">
                                 <text>￥</text>
-                                <view class="val">{{userInfo.memberGrade == 1 ? item.discountPrice :item.sellPrice}}</view>
+                                <view class="val">{{item.discountPrice}}</view>
                             </view>
                         </view>
                     </view>
@@ -84,7 +85,7 @@ let orderNo = ''
 let costAmount = computed(() => {
     let isVip = userInfo.memberGrade == 1
     let total = goodList.value.reduce((t, c) => {
-        return t + (c.spNum || c.productNum) * (isVip ? c.discountPrice : c.sellPrice) * 100
+        return t + (c.spNum || c.productNum) * c.discountPrice * 100
     }, 0)
     return (total / 100).toFixed(2)
 })

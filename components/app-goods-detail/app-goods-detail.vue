@@ -38,7 +38,7 @@
                         </view>
                         <view class="m-price app-flex">
                             <view class="left">臻会员价</view>
-                            <view class="right">￥{{info.discountPrice ?? '--'}}</view>
+                            <view class="right">￥{{info.vipPirce ?? '--'}}</view>
                         </view>
                     </view>
                     <view class="app-flex-item"></view>
@@ -69,7 +69,8 @@
 
 <script setup>
     import { ref, reactive } from 'vue'
-    import * as auth from '@/api/auth'
+    import { goodsDetail } from '@/api/booking'
+    
     import config from '@/config'
     import { userAppStore } from '@/store/app'
 
@@ -85,75 +86,28 @@
         }
     })
     
+    function getDetail(spId) {
+        goodsDetail({spId}).then(data => {
+            info.value = data ?? {}
+            info.value.num = 1
+        })
+    }
     
-    function open(objData) {
-        let data = Object.assign({}, objData, {num: 1})
-        info.value = data
+    function open(id) {
+        // let data = Object.assign({}, objData, {num: 1})
+        // info.value = data
+        getDetail(id)
         isShow.value = true
     }
 
     function close() {
         isShow.value = false
+        info.value = {}
         emit('closed')
     }
     
     function changeNum(data) {
         info.value.num = data.value
-    }
-
-    function getPhoneNumber(evt) {
-        let {
-            iv,
-            encryptedData,
-            errMsg
-        } = evt.detail
-        
-        if (errMsg.indexOf('ok') < 0) {
-            return uni.showToast({
-                icon: 'none',
-                title: '手机号获取失败'
-            })
-        }
-
-        let queryData = {
-            iv,
-            encryptedData,
-            openid: params.openid,
-            sessionKey: params.sessionKey,
-            // avatarUrl: userInfo.avatar,
-            // nickName: userInfo.nickname,
-        }
-        
-        uni.showLoading({
-            title: '授权中'
-        })
-        auth.getPhone(queryData).then(async data => {
-            data.openId = params.openid
-            let info = await setUserInfo(data)
-            
-            data.nickname = userInfo.nickname
-            data.avatar = userInfo.avatar
-            
-            appStore.storeUserInfo(data)
-            close()
-        }).finally(() => {
-            uni.hideLoading()
-        })
-    }
-    
-    function setUserInfo(info) {
-        return new Promise((resolve, reject) => {
-            let params = {
-                token: info.token,
-                nickname: userInfo.nickname,
-                avatar: userInfo.avatar
-            }
-            auth.updateUserInfo(params).then(data => {
-                resolve(data)
-            }).catch(err => {
-                reject(err)
-            })
-        })
     }
 
     defineExpose({

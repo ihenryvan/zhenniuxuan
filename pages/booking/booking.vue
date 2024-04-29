@@ -55,12 +55,12 @@
                         <view class="no-goods" v-if="!cate.gList || cate.gList.length === 0">该分类下暂无商品</view>
                         <view class="list" v-else>
                             <view class="good-item" v-for="(good, goodIndex) in cate.gList">
-                                <app-img class="img" radius="8" @click="onDetail(good)" :src="good.image" w="176" h="176"></app-img>
+                                <app-img class="img" radius="8" @click="onGoodDetail(good)" :src="good.image" w="176" h="176"></app-img>
                                 <view class="intro">
-                                    <view class="name" @click="onDetail(good)">{{good.title}}</view>
-                                    <view class="m-price app-flex" @click="onDetail(good)">
+                                    <view class="name" @click="onGoodDetail(good)">{{good.title}}</view>
+                                    <view class="m-price app-flex" @click="onGoodDetail(good)">
                                         <view class="left">臻会员价</view>
-                                        <view class="right">￥{{good.discountPrice ?? '--'}}</view>
+                                        <view class="right">￥{{good.vipPirce ?? '--'}}</view>
                                     </view>
                                     <view class="bottom app-flex align-center space-between">
                                         <view class="price app-flex">
@@ -124,17 +124,17 @@
                 </view>
                 <view class="list">
                     <view class="good-item" v-for="(good, goodIndex) in cartList">
-                        <app-img class="img" radius="8" :src="good.image" w="176" h="176"></app-img>
+                        <app-img class="img" radius="8" :src="good.image" w="136" h="136"></app-img>
                         <view class="intro">
                             <view class="name">{{good.title}}</view>
-                            <view class="m-price app-flex">
+                            <!-- <view class="m-price app-flex">
                                 <view class="left">臻会员价</view>
                                 <view class="right">￥{{good.discountPrice ?? '--'}}</view>
-                            </view>
+                            </view> -->
                             <view class="bottom app-flex align-center space-between">
                                 <view class="price app-flex">
                                     <text>￥</text>
-                                    <view class="val">{{good.sellPrice}}</view>
+                                    <view class="val">{{good.discountPrice}}</view>
                                 </view>
                                 
                                 <u-number-box :min="0" :value="good.num">
@@ -213,7 +213,7 @@ let cartList = computed(() => {
 let costAmount = computed(() => {
     let isVip = appStore.userInfo.memberGrade == 1
     let total = cartList.value.reduce((t, c) => {
-        return t + c.num * (isVip ? c.discountPrice : c.sellPrice) * 100
+        return t + c.num * c.discountPrice * 100
     }, 0)
     return (total / 100).toFixed(2)
 })
@@ -403,7 +403,7 @@ function closeCartPopup() {
 //     }
 // })
 
-function onDetail(info) {
+function onGoodDetail(info) {
     if (!appStore.hasLogin) {
         uni.showToast({
             title: '请先登录',
@@ -418,7 +418,7 @@ function onDetail(info) {
     }
     
     uni.hideTabBar()
-    detailRef.value.open({...info})
+    detailRef.value.open(info.id)
 }
 
 function onDetailPopupClosed() {
@@ -513,10 +513,16 @@ function sureClear() {
                 }
             }
             .list {
-                padding: 30rpx 30rpx 10rpx;
+                padding: 24rpx 30rpx 10rpx;
                 border-top: solid 1px #eee;
                 max-height: 50vh;
                 overflow-y: scroll;
+                .good-item {
+                    min-height: 160rpx; // 136+24
+                }
+                .intro {
+                    padding-left: 160rpx;
+                }
             }
         }
         .info-wrap {

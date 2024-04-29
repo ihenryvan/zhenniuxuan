@@ -12,6 +12,11 @@ export const getGoods = data => {
     return request.get('/api/product/list', data)
 }
 
+// 店铺-商品分类-商品
+export const goodsDetail = data => {
+    return request.get('/api/product/details', data)
+}
+
 // 加入购物车
 export const addCart = data => {
     return request.post('/api/cart/add', data)
