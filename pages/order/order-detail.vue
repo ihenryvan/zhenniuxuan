@@ -5,11 +5,21 @@
             <view class="status-info">
                 <template v-if="status == 'paid'">
                     <view class="app-flex-center">
-                        <app-img src="/static/order/code.png" w="258" h="258"></app-img>
+                        <view class="code-wrap app-flex-center">
+                            <u-loading-icon mode="circle"></u-loading-icon>
+                            <canvas class="code-img" id="qrcode" canvas-id="qrcode"></canvas>
+                        </view>
                     </view>
-                    <view class="status-txt" style="padding-top: 16rpx;">核销码</view>
-                    
-                    <!-- <canvas id="qrcode" canvas-id="qrcode" style="width: 200px;height: 200px;"></canvas> -->
+                    <view class="status-txt app-flex-center" style="padding-top: 16rpx;">
+                        <text>核销码</text>
+                        <view v-if="codeLoading">（加载中）</view>
+                        <view class="app-flex-center" v-else>
+                            <text>（</text>
+                            <u-count-down ref="countDownRef" :time="5 * 1000" format="ss" :autoStart="false" @finish="onFinish" />
+                            <text>秒后刷新</text>
+                            <text>）</text>
+                        </view>
+                    </view>
                 </template>
                 <template v-else>
                     <view class="app-flex-center">
@@ -85,25 +95,66 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, nextTick } from 'vue'
 import { orderDetail, genCode } from '@/api/order'
 import { userAppStore } from '@/store/app'
 import { orderStatus } from '@/common/js/status'
-import { onLoad } from '@dcloudio/uni-app'
-// import UQRCode from '@/uni_modules/uqrcode'
-
-onLoad(option => {
-    status.value = option.status
-    getDetail(option.id)
-    getCode(option.id)
-    
-    draw()
-})
+import { onLoad, onHide } from '@dcloudio/uni-app'
+import UQRCode from 'uqrcodejs'
 
 let appStore = userAppStore()
 let shopInfo = appStore.shopInfo
 let status = ref('')
 let info = ref({})
+let codeLoading = ref(false)
+let countDownRef = ref(null)
+let orderId = ''
+
+onLoad(option => {
+    orderId = option.id
+    status.value = option.status
+    getCode(orderId)
+    getDetail(orderId)
+})
+
+onHide(() => {
+    
+})
+
+
+function getCode(id) {
+    codeLoading.value = true
+    genCode({id}).then(code => {
+        drawCode(code)
+    }).finally(() => {
+        codeLoading.value = false
+    })
+}
+
+function drawCode(code) {
+    // 获取uQRCode实例
+    var qr = new UQRCode();
+    // 设置二维码内容
+    qr.data = code;
+    // 设置二维码大小，必须与canvas设置的宽高一致
+    qr.size = 129;
+    // 调用制作二维码方法
+    qr.make();
+    // 获取canvas上下文
+    var canvasContext = uni.createCanvasContext('qrcode', this); // 如果是组件，this必须传入
+    // 设置uQRCode实例的canvas上下文
+    qr.canvasContext = canvasContext;
+    // 调用绘制方法将二维码图案绘制到canvas上
+    qr.drawCanvas();
+    
+    setTimeout(() => {
+        countDownRef.value.start()
+    }, 1000)
+}
+
+function onFinish() {
+    getCode(orderId)
+}
 
 function getDetail(id) {
     orderDetail({ id }).then(data => {
@@ -123,22 +174,6 @@ function goMap() {
     })
 }
 
-// function draw() {
-//     var qr = new UQRCode();
-//     qr.data = "https://uqrcode.cn/doc";
-//     qr.size = 200;
-//     qr.make();
-//     var canvas = document.getElementById("qrcode");
-//     var canvasContext = canvas.getContext("2d");
-//     // 设置uQRCode实例的canvas上下文
-//     qr.canvasContext = canvasContext;
-//     // 调用绘制方法将二维码图案绘制到canvas上
-//     qr.drawCanvas();
-// }
-
-function getCode(id) {
-    genCode({id})
-}
 </script>
 
 <style lang="scss">
@@ -155,8 +190,22 @@ function getCode(id) {
             border-radius: 16rpx;
             .status-info {
                 padding: 10rpx 0 44rpx;
+                .code-wrap {
+                    position: relative;
+                    width: 258rpx;
+                    height: 258rpx;
+                    background: #efefef;
+                }
+                .code-img {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    z-index: 1;
+                    width: 100%;
+                    height: 100%;
+                }
                 .status-txt {
-                    font-size: 32rpx;
+                    font-size: 30rpx;
                     text-align: center;
                 }
             }
