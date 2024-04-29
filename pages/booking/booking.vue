@@ -299,7 +299,7 @@ async function updateCartData() {
     let cartList = await initCartList()
     goodsList.value.forEach((cate, cateIndex) => {
         cate.gList.forEach((good, goodIndex) => {
-            let cartGood = cartList.find(cg => cg.spId == good.productId)
+            let cartGood = cartList.find(cg => cg.spId == good.id)
             let indexData = `${cateIndex}-${goodIndex}`
             good.indexData = indexData
             good.num = cartGood ? cartGood.spNum : 0
@@ -451,7 +451,7 @@ function updateCarNum(type, cateIndex, goodIndex, row) {
     
     let isAdd = type !== 1
     
-    api[isAdd ? 'addCart' : 'deductCart']({spId: row.productId, storeId: shopInfo.id}).then(() => {
+    api[isAdd ? 'addCart' : 'deductCart']({spId: row.id, storeId: shopInfo.id}).then(() => {
         // row.num = isAdd ? ++row.num : --row.num
         // api.cartNum({storeId: shopInfo.id}) 查看数量
         goodsList.value[cateIndex].gList[goodIndex].num = isAdd ? ++row.num : --row.num
