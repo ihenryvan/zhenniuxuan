@@ -48,7 +48,7 @@
                 </view>
             </view> -->
             <view class="join-wrap">
-                <app-img src="/static/home/join.png" w="700" h="204"></app-img>
+                <app-img src="/static/home/join.png" w="700" h="200" radius="16"></app-img>
             </view>
             
             

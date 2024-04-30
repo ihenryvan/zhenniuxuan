@@ -1,6 +1,6 @@
 // 是否是开发环境   true:是  false:不是
-const isDevelop = true
-// const isDevelop = false
+// const isDevelop = true
+const isDevelop = false
 // 基础地址   开发环境:线上环境
 const BASE_URL = isDevelop ? 'https://znx.zhjfd.com/' : 'https://aznx.zniux.com/'
 // 项目名称    开发环境:线上环境
