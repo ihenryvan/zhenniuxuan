@@ -142,6 +142,7 @@ function commitPay(data) {
         paySign: data.signMap.paySign,
         success(res) {
             goOrderPage()
+            appStore.updatePayOrderNum()
         },
         fail(err) {
             goOrderPage()

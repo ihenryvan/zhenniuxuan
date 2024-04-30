@@ -242,10 +242,12 @@ let clearTip = reactive({
 })
 
 onShow(() => {
+    // if (!goodsList.value.length || appStore.payOrderNum == 3) {
+    initPage()
+    // }
     if (appStore.hasLogin && goodsList.value.length) {
         updateCartData()
     }
-    
     
     let initCateId = uni.getStorageSync('initCateId')
     if (initCateId) {
@@ -270,7 +272,7 @@ onHide(() => {
     clearStorage()
 })
 
-initPage()
+// initPage()
 
 function initPage() {
     getListData(shopInfo.id)

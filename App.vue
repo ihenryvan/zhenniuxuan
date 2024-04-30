@@ -27,6 +27,7 @@
                     if (data && data.user && data.user.token) {
                         data.openId = data.openid
                         appStore.storeUserInfo(data.user)
+                        appStore.updatePayOrderNum()
                     }
                 })
             }

@@ -67,7 +67,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onLoad, onShow } from '@dcloudio/uni-app'
 import { userAppStore } from '@/store/app'
 import { getShopCate } from '@/api/booking'
 
@@ -80,9 +80,11 @@ let popup = reactive({
 })
 let gridList = ref(['吊龙', '肋条', '牛腱子', '牛腩', '牛肉', '雪花'])
 
+onLoad(() => {
+    isGetLocation()
+})
 onShow(() => {
     getCateList()
-    
 })
 
 function getCateList() {
@@ -117,6 +119,79 @@ function onCall() {
     uni.makePhoneCall({
     	phoneNumber: phone.value
     });
+}
+
+function isGetLocation() {
+    let scopeType = 'scope.userLocation'
+    uni.getSetting({
+        success(res) {
+            if (res.authSetting[scopeType]) { // 已同意
+                getLocInfo()
+            } else { // 未授权 || 已拒绝
+                uni.authorize({ //未授权，底部出现授权提示（不管是授权还是拒绝，只出现一次）
+                    scope: scopeType,
+                    success() { // 选择同意
+                        getLocInfo()
+                    },
+                    fail() { // 选择拒绝 || 已拒绝 （上次上次选择了拒绝，底部不会出现授权弹框，直接走fail）
+                        showTipModal()
+                    }
+                })
+            }
+        }
+    })
+}
+
+function showTipModal() {
+    uni.showModal({
+    	title: '请求授权位置信息',
+    	content: '请您开启位置信息授权，可以为您找到最近的充电桩。',
+    	success: function (res) {
+    		if (res.confirm) {
+    			console.log('用户点击确定');
+                openWxSetting()
+    		} else if (res.cancel) {
+    			console.log('用户点击取消');
+    		}
+    	}
+    })
+}
+
+function openWxSetting() {
+    uni.openSetting({ // 打开小程序设置
+        complete(e) { // 回调函数将在（点击设置页面的返回按钮）返回到原页面时执行
+            console.log('设置结果', e);
+        },
+        success(res) { //
+            if (res.authSetting['scope.userLocation']) {
+                getLocInfo()
+            } else {
+                uni.showToast({
+                    icon: 'none',
+                    title: '您没有授权位置信息，将无法为您查到到最近的充电站',
+                    duration: 3000
+                })
+            }
+        }
+    });
+}
+
+function getLocInfo() {
+    uni.getLocation({
+        type: 'wgs84',
+        geocode: true,
+        success: function(res) {
+            console.log('拿到定位：', res.longitude, res.latitude);
+            // getList(res.longitude, res.latitude)
+        },
+        fail() {
+            uni.showToast({
+                icon: 'none',
+                title: '获取位置失败，请检查是否打开手机定位',
+                duration: 3000
+            })
+        },
+    })
 }
 
 function onLeftClick() {}
