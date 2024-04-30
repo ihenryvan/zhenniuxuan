@@ -40,12 +40,15 @@
                 </view>
             </view>
             
-            <view class="join-wrap">
+            <!-- <view class="join-wrap">
                 <app-img src="/static/home/join.png" w="700" h="204"></app-img>
                 <view class="join-title">
                     <view class="main">99元开通年Plus会员</view>
                     <view class="sub">即送100元立减券+全年9.5折+每月66元券包</view>
                 </view>
+            </view> -->
+            <view class="join-wrap">
+                <app-img src="/static/home/join.png" w="700" h="204"></app-img>
             </view>
             
             
