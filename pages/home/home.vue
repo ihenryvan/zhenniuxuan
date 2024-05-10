@@ -148,7 +148,7 @@ function isGetLocation() {
 function showTipModal() {
     uni.showModal({
     	title: '请求授权位置信息',
-    	content: '请您开启位置信息授权，可以为您找到最近的充电桩。',
+    	content: '请您开启位置信息授权，可以为您找到最近的分店。',
     	success: function (res) {
     		if (res.confirm) {
     			console.log('用户点击确定');
