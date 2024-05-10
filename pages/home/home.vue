@@ -171,7 +171,7 @@ function openWxSetting() {
             } else {
                 uni.showToast({
                     icon: 'none',
-                    title: '您没有授权位置信息，将无法为您查到到最近的充电站',
+                    title: '您没有授权位置信息，将无法为您查到到最近的分店',
                     duration: 3000
                 })
             }
