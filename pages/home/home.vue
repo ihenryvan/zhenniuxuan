@@ -84,7 +84,7 @@ let popup = reactive({
 let gridList = ref(['吊龙', '肋条', '牛腱子', '牛腩', '牛肉', '雪花'])
 
 onLoad(() => {
-    isGetLocation()
+    // isGetLocation()
 })
 onShow(() => {
     getCateList()
